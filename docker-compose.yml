@@ -1,0 +1,36 @@
+networks:
+  52base_network:
+    driver: bridge
+
+services:
+  docket_ai-django:
+    build: .
+    container_name: docket_ai-django
+    user: webinative
+    command: python manage.py runserver 0:8000
+    env_file:
+      - docket_ai-django.env
+      - .env
+    volumes:
+      - .:/home/webinative/code
+      - docket_ai-django-vscode:/home/webinative/.vscode-server
+    ports:
+      - "8000:8000"
+      - "3000:3000"
+    networks:
+      - 52base_network
+    restart: on-failure:5
+
+  docket_ai-mailhog:
+    image: mailhog/mailhog
+    container_name: docket_ai-mailhog
+    logging:
+      driver: "none" # disable logging
+    ports:
+      - "8025:8025" # web ui
+    networks:
+      - 52base_network
+    restart: always
+
+volumes:
+  docket_ai-django-vscode:

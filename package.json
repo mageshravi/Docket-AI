@@ -1,0 +1,33 @@
+{
+  "name": "django-5-2-base",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "compile:css": "sass --style compressed static/css/src/:static/css/dist/",
+    "prefix:css": "postcss -u autoprefixer -r static/css/dist/*.css",
+    "build:css": "bun run compile:css && bun run prefix:css",
+    "watch:css": "sass --style compressed --watch static/css/src/:static/css/dist/",
+    "build:js": "node static/js/bundle.js",
+    "watch:js": "node static/js/watch.js",
+    "kss": "./node_modules/.bin/kss --config kss-config.json",
+    "watch:kss": "onchange 'static/css/src/*.scss' -- npm run kss"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.4.21",
+    "chokidar": "^4.0.3",
+    "esbuild": "^0.25.6",
+    "kss": "^3.1.0",
+    "kss-scheibo": "^2.3.2",
+    "onchange": "^7.1.0",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.1",
+    "sass": "^1.89.2"
+  }
+}

@@ -25,10 +25,18 @@ html5lib==1.1
     # via django-htmlmin
 iniconfig==2.1.0
     # via pytest
+numpy==2.3.1
+    # via pgvector
 packaging==25.0
     # via pytest
+pgvector==0.4.1
+    # via -r requirements.in
 pluggy==1.6.0
     # via pytest
+psycopg[binary]==3.2.9
+    # via -r requirements.in
+psycopg-binary==3.2.9
+    # via psycopg
 pygments==2.19.2
     # via pytest
 pytest==8.4.1
@@ -48,6 +56,8 @@ sqlparse==0.5.3
     #   django
     #   django-debug-toolbar
 typing-extensions==4.14.1
-    # via beautifulsoup4
+    # via
+    #   beautifulsoup4
+    #   psycopg
 webencodings==0.5.1
     # via html5lib

@@ -1,5 +1,5 @@
 networks:
-  52base_network:
+  docket_ai-network:
     driver: bridge
 
 services:
@@ -18,8 +18,22 @@ services:
       - "8000:8000"
       - "3000:3000"
     networks:
-      - 52base_network
+      - docket_ai-network
     restart: on-failure:5
+
+  docket_ai-postgres:
+    image: pgvector/pgvector:pg16
+    container_name: docket_ai-postgres
+    environment:
+      POSTGRES_USER: mravi
+      POSTGRES_PASSWORD: mravi
+      POSTGRES_DB: docket_ai
+    volumes:
+      - docket_ai-postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - docket_ai-network
 
   docket_ai-mailhog:
     image: mailhog/mailhog
@@ -29,8 +43,9 @@ services:
     ports:
       - "8025:8025" # web ui
     networks:
-      - 52base_network
+      - docket_ai-network
     restart: always
 
 volumes:
   docket_ai-django-vscode:
+  docket_ai-postgres-data:

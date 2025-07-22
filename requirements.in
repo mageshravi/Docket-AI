@@ -6,3 +6,5 @@ django-htmlmin~=0.11
 debugpy~=1.8.15
 pytest~=8.4
 pytest-django~=4.11
+pgvector~=0.4.1
+psycopg[binary]~=3.2.9

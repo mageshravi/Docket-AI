@@ -8,3 +8,4 @@ pytest~=8.4
 pytest-django~=4.11
 pgvector~=0.4.1
 psycopg[binary]~=3.2.9
+python-magic~=0.4.27

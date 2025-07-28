@@ -9,3 +9,5 @@ pytest-django~=4.11
 pgvector~=0.4.1
 psycopg[binary]~=3.2.9
 python-magic~=0.4.27
+mail-parser~=4.1.4
+email-reply-parser~=0.5.12

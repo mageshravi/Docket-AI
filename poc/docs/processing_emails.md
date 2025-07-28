@@ -12,12 +12,12 @@
     - content: subject, body and _cleaned body_ (striped of quoted replies)
     - attachments
 1. The parsed data is used to create the `ParsedEmail` model instance.
-1. If any attachment found, the worker creates an instance of the `ParsedEmailAttachment` model, and adds it to the `process_email_attachment` job queue.
+1. If any attachment found, the worker creates an instance of the `ParsedEmailAttachment` model, and adds it to the `embed_email_attachment` job queue.
 1. Upon successfully parsing/saving the EML file contents to the database, the worker adds the file to `embed_email` job queue. This queue's workers create vector embeddings from the cleaned body and saves them to database.
 
-## Process Email Attachment Worker
+## Embed Email Attachment Worker
 
-The `process_email_attachment` worker,
+The `embed_email_attachment` worker,
 
 1. reads the contents of the attachment
 1. chunks them into smaller bits

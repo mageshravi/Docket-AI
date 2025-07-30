@@ -21,8 +21,8 @@ RUN apt-get update && apt-get install -y sudo \
     && echo ${USERNAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USERNAME} \
     && chmod 0440 /etc/sudoers.d/${USERNAME}
 
-# install GIT
-RUN apt install -y git
+# install GIT and python-magic dependencies
+RUN apt install -y git libmagic1
 
 USER ${USERNAME}
 WORKDIR /home/${USERNAME}/code

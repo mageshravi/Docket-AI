@@ -175,3 +175,5 @@ ADMINS = [
     ("Webservices", "webservices@webinative.com"),
 ]
 SERVER_EMAIL = os.getenv("DJANGO_SERVER_EMAIL", "root@localhost")
+
+OPENAI_API_KEY = os.getenv("DJANGO_OPENAI_API_KEY")

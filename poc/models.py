@@ -1,4 +1,5 @@
 from django.db import models
+from pgvector.django import VectorField
 
 from core.models import TimestampedModel
 
@@ -110,6 +111,30 @@ class ParsedEmail(TimestampedModel):
     def __str__(self):
         return f"{self.subject} dated {self.sent_on}"
 
+    def mark_as_processing(self):
+        if self.embedding_status == self.EmbeddingStatus.PROCESSING:
+            return
+
+        self.embedding_status = self.EmbeddingStatus.PROCESSING
+        self.save(update_fields=["embedding_status"])
+
+    def mark_as_completed(self):
+        if self.embedding_status == self.EmbeddingStatus.COMPLETED:
+            return
+
+        self.embedding_status = self.EmbeddingStatus.COMPLETED
+        self.save(update_fields=["embedding_status"])
+
+    def mark_as_failed(self, error_message=None):
+        if self.embedding_status == self.EmbeddingStatus.FAILED:
+            return
+
+        self.embedding_status = self.EmbeddingStatus.FAILED
+        if error_message:
+            self.embedding_error_message = error_message
+
+        self.save(update_fields=["embedding_status", "embedding_error_message"])
+
 
 class ParsedEmailAttachment(TimestampedModel):
     """
@@ -141,3 +166,23 @@ class ParsedEmailAttachment(TimestampedModel):
 
     def __str__(self):
         return self.filename
+
+
+class ParsedEmailEmbedding(TimestampedModel):
+    """
+    Model to store vector embeddings for parsed emails.
+    This model is used to keep track of embeddings created for parsed emails.
+    """
+
+    parsed_email = models.ForeignKey(
+        ParsedEmail, on_delete=models.CASCADE, related_name="parsed_email_embeddings"
+    )
+    chunk_index = models.PositiveSmallIntegerField()
+    chunk = models.TextField()  # The text chunk that was embedded
+    embedding = VectorField(dimensions=1536)
+
+    class Meta:
+        db_table = "poc_parsed_email_embeddings"
+
+    def __str__(self):
+        return f"Embedding for {self.parsed_email.subject} dated {self.parsed_email.sent_on}"

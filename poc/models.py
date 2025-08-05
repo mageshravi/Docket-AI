@@ -1,5 +1,5 @@
 from django.db import models
-from pgvector.django import VectorField
+from pgvector.django import HnswIndex, VectorField
 
 from core.models import TimestampedModel
 
@@ -183,6 +183,15 @@ class ParsedEmailEmbedding(TimestampedModel):
 
     class Meta:
         db_table = "poc_parsed_email_embeddings"
+        indexes = [
+            HnswIndex(
+                name="parsed_email_embedding_hnsw_idx",
+                fields=["embedding"],
+                m=16,
+                ef_construction=200,
+                opclasses=["vector_cosine_ops"],
+            )
+        ]
 
     def __str__(self):
         return f"Embedding for {self.parsed_email.subject} dated {self.parsed_email.sent_on}"

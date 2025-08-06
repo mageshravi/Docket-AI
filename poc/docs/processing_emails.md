@@ -15,15 +15,6 @@
 1. If any attachment found, the worker creates an instance of the `ParsedEmailAttachment` model, and adds it to the `embed_email_attachment` job queue.
 1. Upon successfully parsing/saving the EML file contents to the database, the worker adds the file to `embed_email` job queue. This queue's workers create vector embeddings from the cleaned body and saves them to database.
 
-## Embed Email Attachment Worker
-
-The `embed_email_attachment` worker,
-
-1. reads the contents of the attachment
-1. chunks them into smaller bits
-1. creates vector embeddings for the chunks
-1. saves the chunks + embeddings in the database using the `ParsedEmailAttachmentEmbedding` model.
-
 ## Embed Email Worker
 
 The `embed_email` worker,
@@ -32,3 +23,12 @@ The `embed_email` worker,
 1. chunks into smaller bits if necessary
 1. creates vector embeddings and
 1. saves them to the database using the `ParsedEmailEmbedding` model.
+
+## Embed Email Attachment Worker
+
+The `embed_email_attachment` worker,
+
+1. reads the contents of the attachment
+1. chunks them into smaller bits
+1. creates vector embeddings for the chunks
+1. saves the chunks + embeddings in the database using the `ParsedEmailAttachmentEmbedding` model.

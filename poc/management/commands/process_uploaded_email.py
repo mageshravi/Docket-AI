@@ -1,4 +1,10 @@
+import base64
+
+import mailparser
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.core.management.base import BaseCommand
+from email_reply_parser import EmailReplyParser
 
 from poc.models import ParsedEmail, ParsedEmailAttachment, UploadedFile
 
@@ -37,7 +43,7 @@ class Command(BaseCommand):
 
         if uploaded_file.status != UploadedFile.Status.PENDING and not kwargs["force"]:
             self.stderr.write(
-                self.style.WARNING(
+                self.style.ERROR(
                     f"File with ID {file_id} is not in PENDING status. Use --force to process it anyway."
                 )
             )
@@ -128,9 +134,6 @@ class Command(BaseCommand):
             raise e
 
     def _parse_email(self, uploaded_file):
-        import mailparser
-        from email_reply_parser import EmailReplyParser
-
         email = mailparser.parse_from_file(uploaded_file.file.path)
         cleaned_body = EmailReplyParser.parse_reply(email.body)
 
@@ -151,11 +154,9 @@ class Command(BaseCommand):
 
     def _save_attachment(self, attachment):
         """Saves the attachment to the file system and returns the file path."""
-        from django.core.files.base import ContentFile
-        from django.core.files.storage import default_storage
-
         # Create a ContentFile from the attachment payload
-        content_file = ContentFile(attachment["payload"], name=attachment["filename"])
+        decoded_payload = base64.b64decode(attachment["payload"])
+        content_file = ContentFile(decoded_payload, name=attachment["filename"])
         file_path = f"poc/uploaded_files/attachments/{attachment['filename']}"
 
         # Save the file using the storage system

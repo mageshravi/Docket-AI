@@ -40,7 +40,6 @@ class UploadedFile(TimestampedModel):
         upload_to="poc/uploaded_files/",
         validators=[file_validator],
     )
-    processed = models.BooleanField(default=False)
     status = models.CharField(
         max_length=20, choices=Status.choices, default=Status.PENDING
     )

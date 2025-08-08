@@ -40,7 +40,6 @@ class UploadedFile(TimestampedModel):
         upload_to="poc/uploaded_files/",
         validators=[file_validator],
     )
-    processed = models.BooleanField(default=False)
     status = models.CharField(
         max_length=20, choices=Status.choices, default=Status.PENDING
     )
@@ -126,7 +125,7 @@ class ParsedEmail(TimestampedModel):
         self.save(update_fields=["embedding_status"])
 
     def mark_as_failed(self, error_message=None):
-        if self.embedding_status == self.EmbeddingStatus.FAILED:
+        if self.embedding_status == self.EmbeddingStatus.FAILED and not error_message:
             return
 
         self.embedding_status = self.EmbeddingStatus.FAILED
@@ -167,6 +166,30 @@ class ParsedEmailAttachment(TimestampedModel):
     def __str__(self):
         return self.filename
 
+    def mark_as_processing(self):
+        if self.embedding_status == self.EmbeddingStatus.PROCESSING:
+            return
+
+        self.embedding_status = self.EmbeddingStatus.PROCESSING
+        self.save(update_fields=["embedding_status"])
+
+    def mark_as_completed(self):
+        if self.embedding_status == self.EmbeddingStatus.COMPLETED:
+            return
+
+        self.embedding_status = self.EmbeddingStatus.COMPLETED
+        self.save(update_fields=["embedding_status"])
+
+    def mark_as_failed(self, error_message=None):
+        if self.embedding_status == self.EmbeddingStatus.FAILED and not error_message:
+            return
+
+        self.embedding_status = self.EmbeddingStatus.FAILED
+        if error_message:
+            self.embedding_error_message = error_message
+
+        self.save(update_fields=["embedding_status", "embedding_error_message"])
+
 
 class ParsedEmailEmbedding(TimestampedModel):
     """
@@ -195,3 +218,34 @@ class ParsedEmailEmbedding(TimestampedModel):
 
     def __str__(self):
         return f"Embedding for {self.parsed_email.subject} dated {self.parsed_email.sent_on}"
+
+
+class ParsedEmailAttachmentEmbedding(TimestampedModel):
+    """
+    Model to store vector embeddings for parsed email attachments.
+    This model is used to keep track of embeddings created for parsed email attachments.
+    """
+
+    parsed_email_attachment = models.ForeignKey(
+        ParsedEmailAttachment,
+        on_delete=models.CASCADE,
+        related_name="parsed_email_attachment_embeddings",
+    )
+    chunk_index = models.PositiveSmallIntegerField()
+    chunk = models.TextField()  # The text chunk that was embedded
+    embedding = VectorField(dimensions=1536)
+
+    class Meta:
+        db_table = "poc_parsed_email_attachment_embeddings"
+        indexes = [
+            HnswIndex(
+                name="parsed_email_attachment_hnswidx",  # index name cannot exceed 31 characters
+                fields=["embedding"],
+                m=16,
+                ef_construction=200,
+                opclasses=["vector_cosine_ops"],
+            )
+        ]
+
+    def __str__(self):
+        return f"Embedding for attachment {self.parsed_email_attachment.filename} of email {self.parsed_email_attachment.parsed_email.subject}"

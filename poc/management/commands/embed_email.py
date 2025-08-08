@@ -21,19 +21,21 @@ class Command(BaseCommand):
             help="Number of emails to process in each batch.",
         )
         parser.add_argument(
-            "--retry", action="store_true", help="Retry failed email embeddings."
+            "--force",
+            action="store_true",
+            help="Force processing of emails even if they are not in PENDING status.",
         )
 
     def handle(self, *args, **options):
         email_id = options.get("email_id")
         batch_size = options.get("batch_size")
-        retry = options.get("retry")
+        force = options.get("force")
 
         if email_id:
             self.stdout.write(
                 self.style.SUCCESS(f"Creating embedding for email ID {email_id}.")
             )
-            self._process_email(email_id, retry=retry)
+            self._process_email(email_id, force=force)
         else:
             self.stdout.write(
                 self.style.SUCCESS(
@@ -46,26 +48,35 @@ class Command(BaseCommand):
             for email in emails:
                 self._process_email(email.id)
 
-    def _process_email(self, email_id: int, retry: bool = False):
+    def _process_email(self, email_id: int, force: bool = False):
         try:
             email = ParsedEmail.objects.get(id=email_id)
 
-            if email.embedding_status != ParsedEmail.EmbeddingStatus.PENDING:
-                if email.embedding_status != ParsedEmail.EmbeddingStatus.FAILED:
+            if email.embedding_status == ParsedEmail.EmbeddingStatus.PROCESSING:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"Email ID {email_id} is already being processed. Skipping."
+                    )
+                )
+                return
+
+            if email.embedding_status in [
+                ParsedEmail.EmbeddingStatus.COMPLETED,
+                ParsedEmail.EmbeddingStatus.FAILED,
+            ]:
+                if not force:
                     self.stdout.write(
                         self.style.WARNING(
-                            f"Email ID {email_id} already has an embedding status of {email.embedding_status}. Skipping."
+                            f"Email ID {email_id} has already been processed. Use --force to attempt embedding again."
                         )
                     )
                     return
 
-                if not retry:
-                    self.stdout.write(
-                        self.style.WARNING(
-                            f"Email ID {email_id} has failed status. Use --retry to attempt embedding again."
-                        )
-                    )
-                    return
+                # delete existing embeddings if force is used
+                ParsedEmailEmbedding.objects.filter(parsed_email=email).delete()
+                self.stdout.write(
+                    f"Force processing of email ID {email_id}. Deleted existing embeddings."
+                )
 
             email.mark_as_processing()
 

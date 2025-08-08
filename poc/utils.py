@@ -116,14 +116,16 @@ def extract_text_from_docx(file_path: str) -> Generator[str, None, None]:
     from docx import Document
     from docx.oxml.table import CT_Tbl
     from docx.oxml.text.paragraph import CT_P
+    from docx.table import Table
 
     doc = Document(file_path)
     for child in doc.element.body.iterchildren():
         if isinstance(child, CT_P):
             yield child.text
         elif isinstance(child, CT_Tbl):
+            table = Table(child, doc)
             text = ""
-            for row in child.rows:
+            for row in table.rows:
                 text += "\t".join(cell.text for cell in row.cells) + "\n"
 
             yield text
@@ -192,10 +194,10 @@ def extract_text_from_csv(file_path: str) -> Generator[str, None, None]:
     df = pd.read_csv(file_path)
     chunk = []
     for _, row in df.iterrows():
-        chunk.append("\t".join(str(value) for value in row if pd.notna(value)) + "\n")
+        chunk.append("\t".join(str(value) for value in row if pd.notna(value)))
         if len(chunk) >= 200:
-            yield "".join(chunk)
+            yield "\n".join(chunk)
             chunk = []
 
     if chunk:
-        yield "".join(chunk)
+        yield "\n".join(chunk)

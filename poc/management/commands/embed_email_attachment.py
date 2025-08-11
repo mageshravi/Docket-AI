@@ -35,56 +35,19 @@ class Command(BaseCommand):
 
         try:
             attachment = ParsedEmailAttachment.objects.get(id=attachment_id)
-        except ParsedEmailAttachment.DoesNotExist:
-            self.stderr.write(
-                self.style.ERROR(
-                    f"Parsed email attachment with ID {attachment_id} does not exist."
-                )
-            )
-            return
 
-        if (
-            attachment.embedding_status
-            == ParsedEmailAttachment.EmbeddingStatus.PROCESSING
-        ):
-            self.stderr.write(
-                self.style.ERROR(
-                    f"Attachment with ID {attachment_id} is already being processed."
-                )
-            )
-            return
-
-        if attachment.embedding_status in [
-            ParsedEmailAttachment.EmbeddingStatus.COMPLETED,
-            ParsedEmailAttachment.EmbeddingStatus.FAILED,
-        ]:
-            if not force:
-                self.stderr.write(
-                    self.style.ERROR(
-                        f"Attachment with ID {attachment_id} has already been processed. Use --force to retry."
-                    )
-                )
-                return
-
-            # delete existing embeddings if force is used
-            ParsedEmailAttachmentEmbedding.objects.filter(
-                parsed_email_attachment=attachment
-            ).delete()
-
-            self.stdout.write(
-                f"Force processing of attachment with ID {attachment_id}. Deleted existing embeddings."
-            )
-
-        try:
             self._validate_file_size(attachment)
 
-            if attachment.filename.endswith(".pdf"):
+            if not self._validate_status(attachment, force):
+                self._force_cleanup(attachment)
+
+            if attachment.filename.endswith(".xlsx"):
+                # Handle XLSX files with a specific method (different from others)
+                self._handle_xlsx_attachment(attachment)
+            elif attachment.filename.endswith(".pdf"):
                 self._chunk_and_embed_with_rolling_buffer(
                     attachment, extract_function=extract_text_from_pdf
                 )
-            elif attachment.filename.endswith(".xlsx"):
-                # Handle XLSX files with a specific method (different from others)
-                self._handle_xlsx_attachment(attachment)
             elif attachment.filename.endswith(".docx"):
                 self._chunk_and_embed_with_rolling_buffer(
                     attachment, extract_function=extract_text_from_docx
@@ -109,17 +72,80 @@ class Command(BaseCommand):
                 )
                 attachment.mark_as_failed("Unsupported file type.")
                 return
-
-        except Exception as e:
-            attachment.mark_as_failed()
+        except ParsedEmailAttachment.DoesNotExist:
             self.stderr.write(
-                self.style.ERROR(f"Failed to vectorize attachment {attachment_id}: {e}")
+                self.style.ERROR(
+                    f"Parsed email attachment with ID {attachment_id} does not exist."
+                )
             )
+        except (ValueError, RuntimeError) as err:
+            if attachment:
+                attachment.mark_as_failed(str(err))
+
+            self.stderr.write(self.style.ERROR(str(err)))
+        except Exception as err:
+            if attachment:
+                attachment.mark_as_failed(str(err))
+
+            self.stderr.write(
+                self.style.ERROR(
+                    f"Failed to vectorize attachment {attachment_id}: {err}"
+                )
+            )
+
+    def _validate_status(
+        self, attachment: ParsedEmailAttachment, force: bool = False
+    ) -> bool:
+        """
+        Validate the status of the attachment before processing.
+
+        Args:
+            attachment (ParsedEmailAttachment): The attachment to validate.
+            force (bool, optional): Whether to force process. Defaults to False.
+
+        Raises:
+            RuntimeError: If the attachment is already being processed.
+            RuntimeError: If the attachment has already been processed and force is not set.
+
+        Returns:
+            bool: True if the attachment is valid for processing, False otherwise.
+        """
+        if (
+            attachment.embedding_status
+            == ParsedEmailAttachment.EmbeddingStatus.PROCESSING
+        ):
+            raise RuntimeError(
+                f"Attachment with ID {attachment.id} is already being processed."
+            )
+
+        if attachment.embedding_status in [
+            ParsedEmailAttachment.EmbeddingStatus.COMPLETED,
+            ParsedEmailAttachment.EmbeddingStatus.FAILED,
+        ]:
+            if not force:
+                raise RuntimeError(
+                    f"Attachment with ID {attachment.id} has already been processed. Use --force to retry."
+                )
+
+            return False
+
+        return True
+
+    def _force_cleanup(self, attachment: ParsedEmailAttachment):
+        """Force cleanup of existing embeddings for the attachment."""
+        ParsedEmailAttachmentEmbedding.objects.filter(
+            parsed_email_attachment=attachment
+        ).delete()
+        self.stdout.write(
+            f"Force cleanup: Deleted existing embeddings for attachment {attachment.id}."
+        )
 
     def _validate_file_size(self, attachment: ParsedEmailAttachment):
         """
         Validate the file size of the attachment.
-        Raises an error if the file size exceeds 25MB.
+
+        Raises:
+            ValueError: If the file size exceeds the 25MB limit.
         """
         if attachment.file.size > 25 * 1024 * 1024:
             raise ValueError(

@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
     "core",
     "poc",
 ]
@@ -177,3 +178,8 @@ ADMINS = [
 SERVER_EMAIL = os.getenv("DJANGO_SERVER_EMAIL", "root@localhost")
 
 OPENAI_API_KEY = os.getenv("DJANGO_OPENAI_API_KEY")
+
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+}

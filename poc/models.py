@@ -206,6 +206,7 @@ class ParsedEmailEmbedding(TimestampedModel):
 
     class Meta:
         db_table = "poc_parsed_email_embeddings"
+        unique_together = (("parsed_email", "chunk_index"),)
         indexes = [
             HnswIndex(
                 name="parsed_email_embedding_hnsw_idx",
@@ -237,6 +238,7 @@ class ParsedEmailAttachmentEmbedding(TimestampedModel):
 
     class Meta:
         db_table = "poc_parsed_email_attachment_embeddings"
+        unique_together = (("parsed_email_attachment", "chunk_index"),)
         indexes = [
             HnswIndex(
                 name="parsed_email_attachment_hnswidx",  # index name cannot exceed 31 characters
@@ -249,3 +251,34 @@ class ParsedEmailAttachmentEmbedding(TimestampedModel):
 
     def __str__(self):
         return f"Embedding for attachment {self.parsed_email_attachment.filename} of email {self.parsed_email_attachment.parsed_email.subject}"
+
+
+class UploadedFileEmbedding(TimestampedModel):
+    """
+    Model to store vector embeddings of uploaded files.
+    """
+
+    uploaded_file = models.ForeignKey(
+        UploadedFile,
+        on_delete=models.CASCADE,
+        related_name="uploaded_file_embeddings",
+    )
+    chunk_index = models.PositiveSmallIntegerField()
+    chunk = models.TextField()
+    embedding = VectorField(dimensions=1536)
+
+    class Meta:
+        db_table = "poc_uploaded_file_embeddings"
+        unique_together = (("uploaded_file", "chunk_index"),)
+        indexes = [
+            HnswIndex(
+                name="uploaded_file_mbdng_hnsw_idx",
+                fields=["embedding"],
+                m=16,
+                ef_construction=200,
+                opclasses=["vector_cosine_ops"],
+            )
+        ]
+
+    def __str__(self):
+        return f"Embedding for {self.uploaded_file.file.name}"

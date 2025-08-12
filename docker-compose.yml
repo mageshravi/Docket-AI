@@ -5,6 +5,7 @@ networks:
 services:
   docket_ai-django:
     build: .
+    image: docket_ai-django
     container_name: docket_ai-django
     user: webinative
     command: python manage.py runserver 0:8000
@@ -44,7 +45,32 @@ services:
       - "8025:8025" # web ui
     networks:
       - docket_ai-network
-    restart: always
+    restart: on-failure:5
+
+  docket_ai-redis:
+    image: redis:8.2-bookworm
+    container_name: docket_ai-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - docket_ai-network
+    restart: on-failure:5
+
+  docket_ai-celery:
+    image: docket_ai-django
+    container_name: docket_ai-celery
+    user: webinative
+    command: python -m celery -A docket_ai worker --loglevel=INFO
+    env_file:
+      - docket_ai-django.env
+      - .env
+    volumes:
+      - .:/home/webinative/code
+    depends_on:
+      - docket_ai-redis
+      - docket_ai-postgres
+    networks:
+      - docket_ai-network
 
 volumes:
   docket_ai-django-vscode:

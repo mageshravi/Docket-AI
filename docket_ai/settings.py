@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_celery_results",
     "rest_framework",
     "core",
     "poc",
@@ -179,7 +180,36 @@ SERVER_EMAIL = os.getenv("DJANGO_SERVER_EMAIL", "root@localhost")
 
 OPENAI_API_KEY = os.getenv("DJANGO_OPENAI_API_KEY")
 
+# django-rest-framework
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
 }
+
+# redis as cache
+REDIS_CACHE_HOST = os.getenv("DJANGO_REDIS_CACHE_HOST", "docket_ai-redis")
+REDIS_CACHE_PORT = os.getenv("DJANGO_REDIS_CACHE_PORT", 6379)
+REDIS_CACHE_DB = os.getenv(
+    "DJANGO_REDIS_CACHE_DB", "10"
+)  # use db 10 for caching (out of 16 logical databases)
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{REDIS_CACHE_HOST}:{REDIS_CACHE_PORT}",
+        "OPTIONS": {
+            "db": REDIS_CACHE_DB,
+        },
+    }
+}
+
+# redis as message broker (for celery)
+REDIS_BROKER_HOST = os.getenv("DJANGO_REDIS_BROKER_HOST", "docket_ai-redis")
+REDIS_BROKER_PORT = os.getenv("DJANGO_REDIS_BROKER_PORT", 6379)
+REDIS_BROKER_DB = os.getenv(
+    "DJANGO_REDIS_BROKER_DB", "11"
+)  # use db 11 for message broker (out of 16 logical databases)
+
+# celery
+CELERY_BROKER_URL = f"redis://{REDIS_BROKER_HOST}:{REDIS_BROKER_PORT}/{REDIS_BROKER_DB}"
+CELERY_CACHE_BACKEND = "django-cache"
+CELERY_RESULT_BACKEND = "django-db"

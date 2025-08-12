@@ -10,43 +10,22 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--email_id",
+            "email_id",
             type=int,
-            help="ID of the email to embed. If not provided, all emails will be processed.",
-        )
-        parser.add_argument(
-            "--batch_size",
-            type=int,
-            default=100,
-            help="Number of emails to process in each batch.",
+            help="ID of the email to embed.",
         )
         parser.add_argument(
             "--force",
             action="store_true",
-            help="Force processing of emails even if they are not in PENDING status.",
+            help="Force vectorization even if the email is already processed.",
         )
 
     def handle(self, *args, **options):
-        email_id = options.get("email_id")
-        batch_size = options.get("batch_size")
+        email_id = options["email_id"]
         force = options.get("force")
 
-        if email_id:
-            self.stdout.write(
-                self.style.SUCCESS(f"Creating embedding for email ID {email_id}.")
-            )
-            self._process_email(email_id, force=force)
-        else:
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"Creating embeddings for first {batch_size} PENDING emails."
-                )
-            )
-            emails = ParsedEmail.objects.filter(
-                embedding_status=ParsedEmail.EmbeddingStatus.PENDING
-            ).order_by("id")[:batch_size]
-            for email in emails:
-                self._process_email(email.id)
+        self.stdout.write(f"Creating embedding for email ID {email_id}.")
+        self._process_email(email_id, force=force)
 
     def _process_email(self, email_id: int, force: bool = False):
         try:

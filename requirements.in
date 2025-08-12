@@ -20,3 +20,6 @@ python-docx~=1.2.0
 python-pptx~=1.0.2
 langchain[openai]~=0.3
 djangorestframework~=3.16.1
+celery~=5.5
+redis~=6.4.0
+django-celery-results~=2.6.0

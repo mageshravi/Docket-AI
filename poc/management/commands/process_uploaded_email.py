@@ -72,6 +72,7 @@ class Command(BaseCommand):
                     "subject": email.subject,
                     "body": email.body,
                     "cleaned_body": cleaned_body,
+                    "ai_summary": "",
                 },
                 uploaded_file=uploaded_file,
             )
@@ -108,6 +109,7 @@ class Command(BaseCommand):
                     filename=attachment["filename"],
                     content_type=attachment["mail_content_type"],
                     size=len(attachment["payload"]),
+                    ai_summary="",
                 )
                 parsed_attachments.append(parsed_email_attachment)
 

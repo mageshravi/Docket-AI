@@ -5,7 +5,7 @@ from poc.models import ChatMessage, ChatThread
 
 
 class DjangoChatMessageHistory(BaseChatMessageHistory):
-    def __init__(self, thread_id: int, max_turns: int = 5):
+    def __init__(self, thread_id: int, max_turns: int = 10):
         self.thread = ChatThread.objects.get(pk=thread_id)
         self.max_turns = max_turns
 

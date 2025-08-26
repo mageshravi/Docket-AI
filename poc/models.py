@@ -45,7 +45,7 @@ class UploadedFile(TimestampedModel):
     status = models.CharField(
         max_length=20, choices=Status.choices, default=Status.PENDING
     )
-    error_message = models.TextField(blank=True, null=True)
+    error_message = models.TextField(blank=True)
 
     class Meta:
         db_table = "poc_uploaded_files"
@@ -96,15 +96,15 @@ class ParsedEmail(TimestampedModel):
     sent_on = models.DateTimeField()
     sender = models.EmailField()
     to_recipients = models.CharField()
-    cc_recipients = models.CharField(blank=True, null=True)
+    cc_recipients = models.CharField(blank=True)
     subject = models.CharField(max_length=255)
     body = models.TextField()
     cleaned_body = models.TextField()
-    ai_summary = models.TextField(blank=True, null=True)
+    ai_summary = models.TextField(blank=True)
     embedding_status = models.CharField(
         max_length=20, choices=EmbeddingStatus.choices, default=EmbeddingStatus.PENDING
     )
-    embedding_error_message = models.TextField(blank=True, null=True)
+    embedding_error_message = models.TextField(blank=True)
 
     class Meta:
         db_table = "poc_parsed_emails"
@@ -156,11 +156,11 @@ class ParsedEmailAttachment(TimestampedModel):
     filename = models.CharField(max_length=255)
     content_type = models.CharField(max_length=255)
     size = models.PositiveIntegerField()  # Size in bytes
-    ai_summary = models.TextField(blank=True, null=True)
+    ai_summary = models.TextField(blank=True)
     embedding_status = models.CharField(
         max_length=20, choices=EmbeddingStatus.choices, default=EmbeddingStatus.PENDING
     )
-    embedding_error_message = models.TextField(blank=True, null=True)
+    embedding_error_message = models.TextField(blank=True)
 
     class Meta:
         db_table = "poc_parsed_email_attachments"
@@ -309,10 +309,10 @@ class Litigant(TimestampedModel):
 
     name = models.CharField(max_length=255)
     bio = models.CharField(max_length=255)
-    email = models.EmailField(blank=True, null=True)
-    phone = models.CharField(max_length=20, blank=True, null=True)
-    address = models.TextField(blank=True, null=True)
-    notes = models.TextField(blank=True, null=True)
+    email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+    address = models.TextField(blank=True)
+    notes = models.TextField(blank=True)
 
     # ? Why no unique constraints.
     # * Because a litigant may be involved in different cases with different bio's/notes, and also different timelines.
@@ -333,13 +333,12 @@ class Case(TimestampedModel):
     title = models.CharField(max_length=255)
     description = models.TextField(
         blank=True,
-        null=True,
         help_text="Include the nature of dispute and summary of the conflict.",
     )
     litigants = models.ManyToManyField(
         Litigant, related_name="cases", through="CaseLitigant"
     )
-    case_number = models.CharField(max_length=64, unique=True, blank=True, null=True)
+    case_number = models.CharField(max_length=64, unique=True, blank=True)
 
     class Meta:
         db_table = "poc_cases"
@@ -370,3 +369,42 @@ class CaseLitigant(TimestampedModel):
 
     def __str__(self):
         return f"{self.litigant} in {self.case}"
+
+
+class ChatThread(TimestampedModel):
+    """
+    Model to store a chat thread.
+    This model is used to keep track of chat conversations.
+    """
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    title = models.CharField(max_length=255, blank=True)
+    case = models.ForeignKey(
+        Case,
+        on_delete=models.CASCADE,
+        related_name="chat_threads",
+        blank=False,
+        null=True,
+    )
+
+    class Meta:
+        db_table = "poc_chat_threads"
+
+    def __str__(self):
+        return self.title if self.title else "Chat Thread"
+
+
+class ChatMessage(TimestampedModel):
+    """
+    Model to store a chat message.
+    """
+
+    class Role(models.TextChoices):
+        USER = "user", "User"
+        AI = "ai", "AI"
+
+    thread = models.ForeignKey(
+        ChatThread, on_delete=models.CASCADE, related_name="messages"
+    )
+    role = models.CharField(max_length=10, choices=Role.choices)
+    content = models.TextField()

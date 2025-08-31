@@ -1,0 +1,54 @@
+/*
+Headings
+
+Headings H1 to H6
+
+Markup:
+<h1>Heading 1</h1>
+<h2>Heading 2</h2>
+<h3>Heading 3</h3>
+<h4>Heading 4</h4>
+<h5>Heading 5</h5>
+<h6>Heading 6</h6>
+
+Styleguide: Base.Headings
+*/
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: bold;
+    line-height: 120%;
+    color: var(--heading-txt);
+}
+
+h1 {
+    margin-block-end: 0.67rem;
+    font-size: 2rem;
+}
+
+h2 {
+    margin-block-end: 0.83rem;
+    font-size: 1.5rem;
+}
+
+h3 {
+    margin-block-end: 1rem;
+    font-size: 1.16875rem;
+}
+
+h4 {
+    margin-block-end: 1.2rem;
+    font-size: 1rem;
+}
+
+h5 {
+    margin-block-end: 1.67rem;
+    font-size: 0.8313rem;
+    text-transform: uppercase;
+}
+
+h6 {
+    margin-block-end: 2.33rem;
+    font-size: 0.6687rem;
+    text-transform: uppercase;
+}

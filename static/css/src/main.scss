@@ -1,1 +1,11 @@
-@import 'normalize.css';
+@use 'normalize.css';
+
+@use 'fonts';
+@use 'vars';
+
+@use 'headings';
+@use 'body';
+
+@use 'm-btn';
+@use 'm-textbox';
+@use 'm-textarea';

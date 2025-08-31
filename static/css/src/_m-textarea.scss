@@ -1,0 +1,114 @@
+/*
+Textarea
+
+Multi-line text input element for forms.
+
+Markup:
+<div class="m-textarea {{ modifier_class }}">
+    <label for="textarea-id-{{ modifier_class }}" class="m-textarea__label">Address</label>
+    <span class="m-textarea__error-text">This field is required.</span>
+    <textarea id="textarea-id-{{ modifier_class }}" class="m-textarea__input" placeholder="Permanent Address" required></textarea>
+    <span class="m-textarea__help-text">Provide detailed address information.</span>
+</div>
+
+.has-error - Has error
+
+Styleguide: Forms.Textarea
+*/
+.m-textarea {
+    display: flex;
+    flex-flow: column;
+    row-gap: 4px;
+
+    ::placeholder {
+        color: var(--ip-placeholder-txt);
+        opacity: 0.9;
+    }
+
+    &__label {
+        font-weight: bold;
+        color: var(--label-txt);
+    }
+
+    &:has(textarea:required) &__label::after {
+        content: '*';
+        color: var(--docket-red);
+    }
+
+    &:has(textarea:disabled) &__label {
+        color: var(--label-txt--disabled);
+    }
+
+    &__input {
+        border: var(--ip-border-width) solid var(--ip-border-color);
+        padding: 10px 12px;
+        background-color: var(--ip-bg);
+        color: var(--body-txt);
+        min-height: 104px; // 3.5 lines of text
+        font-family: var(--font-body);
+        line-height: 150%;
+
+        &:focus {
+            outline: none;
+            border-width: var(--ip-border-width--focused);
+            border-color: var(--ip-border-color--focused);
+            padding: 9px 11px; // Adjust padding to account for increased border width
+            box-shadow: inset 0 4px 4px rgba(0, 0, 0, 0.25);
+        }
+
+        &:disabled {
+            border-color: var(--ip-border-color--disabled);
+            background-color: var(--ip-bg--disabled);
+            cursor: not-allowed;
+        }
+
+        &:disabled::placeholder {
+            color: var(--ip-placeholder-txt--disabled);
+        }
+    }
+
+    &.has-error &__input {
+        border-color: var(--ip-border-color--error);
+    }
+
+    &__help-text {
+        font-style: italic;
+        color: var(--help-txt);
+    }
+
+    &:has(textarea:disabled) &__help-text {
+        opacity: 0.7;
+        user-select: none;
+    }
+
+    &__error-text {
+        font-style: italic;
+        color: var(--error-txt);
+        display: none;
+    }
+
+    &:has(textarea:disabled) &__error-text {
+        opacity: 0.7;
+        user-select: none;
+    }
+
+    &.has-error &__error-text {
+        display: block;
+    }
+}
+
+/*
+Disabled
+
+Disabled textarea element for forms.
+
+Markup:
+<div class="m-textarea">
+    <label for="disabled-textarea-id" class="m-textarea__label">Address</label>
+    <textarea id="disabled-textarea-id" class="m-textarea__input" placeholder="Permanent Address" disabled></textarea>
+    <span class="m-textarea__help-text">Provide detailed address information.</span>
+    <span class="m-textarea__error-text">This field is required.</span>
+</div>
+
+Styleguide: Forms.Textarea.Disabled
+*/

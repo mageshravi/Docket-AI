@@ -1,0 +1,86 @@
+/*
+Buttons
+
+Button elements are used to trigger actions.
+
+Markup:
+<button class="m-btn {{ modifier_class }}">Click me</button>
+&nbsp;
+<button class="m-btn {{ modifier_class }}" disabled>Disabled</button>
+
+.m-btn--primary - Primary button
+.m-btn--secondary - Secondary button
+
+Styleguide: Forms.Buttons
+*/
+
+.m-btn {
+    --btn-bg: lightgray;
+    --btn-bg--hover: darkgray;
+    --btn-bg--active: gray;
+    --btn-bg--primary: #3BB4C1;
+    --btn-bg--primary-hover: #34A0AD;
+    --btn-bg--primary-active: #2B8C97;
+    --btn-bg--secondary: white;
+    --btn-bg--secondary-hover: #E8F7F9;
+    --btn-bg--secondary-active: #D0EEF1;
+    --btn-txt: black;
+    --btn-txt--active: white;
+    --btn-txt--primary: white;
+    --btn-txt--secondary: #3BB4C1;
+    --btn-txt--secondary-hover: #34A0AD;
+    --btn-txt--secondary-active: #2B8C97;
+
+    border: 1px solid;
+    border-color: transparent;
+    padding: 0.625rem 1rem;
+    color: var(--btn-txt);
+    background-color: var(--btn-bg);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    border-radius: 5px;
+
+    &:enabled:hover {
+        background-color: var(--btn-bg--hover);
+    }
+
+    &:enabled:active {
+        background-color: var(--btn-bg--active);
+        color: var(--btn-txt--active);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    &--primary {
+        background-color: var(--btn-bg--primary);
+        color: var(--btn-txt--primary);
+
+        &:enabled:hover {
+            background-color: var(--btn-bg--primary-hover);
+        }
+
+        &:enabled:active {
+            background-color: var(--btn-bg--primary-active);
+        }
+    }
+
+    &--secondary {
+        background-color: var(--btn-bg--secondary);
+        color: var(--btn-txt--secondary);
+
+        border-color: var(--btn-txt--secondary);
+
+        &:enabled:hover {
+            background-color: var(--btn-bg--secondary-hover);
+            color: var(--btn-txt--secondary-hover);
+        }
+
+        &:enabled:active {
+            background-color: var(--btn-bg--secondary-active);
+            color: var(--btn-txt--secondary-active);
+        }
+    }
+}

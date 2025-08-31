@@ -1,0 +1,111 @@
+/*
+Textbox
+
+Text input element for forms.
+
+Markup:
+<div class="m-textbox {{ modifier_class }}">
+    <label for="textbox-id" class="m-textbox__label">Full Name</label>
+    <span class="m-textbox__error-text">This field is required.</span>
+    <input type="text" id="textbox-id" class="m-textbox__input" placeholder="Santhosh Subramaniam" required />
+    <span class="m-textbox__help-text">Only alphabets, whitespace and apostrophe allowed.</span>
+</div>
+
+.has-error - Has error
+
+Styleguide: Forms.Textbox
+*/
+.m-textbox {
+    display: flex;
+    flex-flow: column;
+    row-gap: 4px;
+
+    ::placeholder {
+        color: var(--ip-placeholder-txt);
+        opacity: 0.9;
+    }
+
+    &__label {
+        font-weight: bold;
+        color: var(--label-txt);
+    }
+
+    &:has(input:required) &__label::after {
+        content: '*';
+        color: var(--docket-red);
+    }
+
+    &:has(input:disabled) &__label {
+        color: var(--label-txt--disabled);
+    }
+
+    &__input {
+        border: var(--ip-border-width) solid var(--ip-border-color);
+        padding: 10px 12px;
+        background-color: var(--ip-bg);
+        color: var(--body-txt);
+
+        &:focus {
+            outline: none;
+            border-width: var(--ip-border-width--focused);
+            border-color: var(--ip-border-color--focused);
+            padding: 9px 11px; // Adjust padding to account for increased border width
+            box-shadow: inset 0 4px 4px rgba(0, 0, 0, 0.25);
+        }
+
+        &:disabled {
+            border-color: var(--ip-border-color--disabled);
+            background-color: var(--ip-bg--disabled);
+            cursor: not-allowed;
+        }
+
+        &:disabled::placeholder {
+            color: var(--ip-placeholder-txt--disabled);
+        }
+    }
+
+    &.has-error &__input {
+        border-color: var(--ip-border-color--error);
+    }
+
+    &__help-text {
+        font-style: italic;
+        color: var(--help-txt);
+    }
+
+    &:has(input:disabled) &__help-text {
+        opacity: 0.7;
+        user-select: none;
+    }
+
+    &__error-text {
+        font-style: italic;
+        color: var(--error-txt);
+        display: none;
+    }
+
+    &:has(input:disabled) &__error-text {
+        opacity: 0.7;
+        user-select: none;
+    }
+
+    &.has-error &__error-text {
+        display: block;
+    }
+}
+
+/*
+Disabled
+
+Disabled text input element for forms.
+
+Markup:
+<div class="m-textbox">
+    <label for="disabled-textbox-id" class="m-textbox__label">Full Name</label>
+    <input type="text" id="disabled-textbox-id" class="m-textbox__input" placeholder="Santhosh Subramaniam" disabled />
+    <span class="m-textbox__help-text">Only alphabets, whitespace and apostrophe allowed.</span>
+    <span class="m-textbox__error-text">This field is required.</span>
+</div>
+
+Styleguide: Forms.Textbox.Disabled
+*/

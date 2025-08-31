@@ -11,6 +11,7 @@
     --docket-red: #D64545;
     --verdict-green: #38AB3D;
 
+    /* Base */
     --heading-txt: var(--oxford-blue);
     --body-txt: var(--deposition-grey);
     --body-txt--secondary: var(--docket-grey);
@@ -20,12 +21,29 @@
     --link-txt: var(--steel-blue);
     --link-txt--visited: var(--muted-violet);
 
+    --font-heading: 'DM Serif Display', serif;
+    --font-body: 'DM Sans', sans-serif;
+
+    /* Alerts */
     --alert-debug: var(--muted-violet);
     --alert-info: var(--steel-blue);
     --alert-warning: var(--amber-gold);
     --alert-error: var(--docket-red);
     --alert-success: var(--verdict-green);
 
-    --font-heading: 'DM Serif Display', serif;
-    --font-body: 'DM Sans', sans-serif;
+    /* Form Input Elements */
+    --label-txt: #000;
+    --label-txt--disabled: #808080;
+    --ip-border-width: 1px;
+    --ip-border-width--focused: 2px;
+    --ip-border-color: #9CA7AD;
+    --ip-border-color--disabled: #CBD3D6;
+    --ip-border-color--focused: #3BB4C1;
+    --ip-border-color--error: var(--docket-red);
+    --ip-placeholder-txt: #7F909D;
+    --ip-placeholder-txt--disabled: #BCC6CB;
+    --ip-bg: #F8F7F3;
+    --ip-bg--disabled: #F0F2F3;
+    --help-txt: var(--body-txt--secondary);
+    --error-txt: var(--docket-red);
 }

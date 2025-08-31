@@ -1,0 +1,74 @@
+/*
+Body text
+
+Text content inside the HTML body element
+
+Markup:
+<div>The quick brown fox jumps over the lazy dog.</div>
+
+Styleguide: Base.Body
+*/
+
+body {
+    font-size: 16px;
+    line-height: 150%;
+    color: var(--body-txt);
+
+    .secondary-txt {
+        color: var(--body-txt--secondary);
+    }
+}
+
+::selection {
+    background-color: var(--user-selection-bg);
+}
+
+/*
+Paragraphs
+
+Paragraph elements are used to define blocks of text.
+
+Markup:
+<p>The quick brown fox jumps over the lazy dog.</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Pellentesque tempor turpis in velit tincidunt, et vehicula ligula posuere.
+Vivamus  dignissim et velit in convallis.</p>
+
+Styleguide: Base.Body.Paragraphs
+*/
+
+p {
+    font-size: 1rem;
+    line-height: 150%;
+    color: var(--body-txt);
+
+    &.secondary-txt {
+        color: var(--body-txt--secondary);
+    }
+}
+
+/*
+Links
+
+Hyperlinks are used to link to other web pages or resources.
+
+Markup:
+<a class="{{ modifier_class }}" href="https://www.example.com">Example.com</a>
+
+:visited - Visited link
+
+Styleguide: Base.Body.Links
+*/
+a {
+    color: var(--link-txt);
+    text-decoration: underline;
+
+    &:hover {
+        text-decoration: none;
+    }
+
+    &:visited,
+    &.pseudo-class-visited {
+        color: var(--link-txt--visited);
+    }
+}

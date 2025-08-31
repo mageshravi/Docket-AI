@@ -1,1 +1,8 @@
-@import 'normalize.css';
+@use 'normalize.css';
+
+@use 'fonts';
+@use 'vars';
+
+@use 'headings';
+@use 'body';
+@use 'buttons';

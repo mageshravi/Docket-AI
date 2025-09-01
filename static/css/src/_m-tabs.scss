@@ -1,0 +1,38 @@
+/*
+Tabs
+
+Tabs for navigating between different sections of content.
+
+Markup:
+<nav class="m-tabs">
+    <a href="#tab1" class="m-tabs__tab" aria-selected="true">Tab 1</a>
+    <a href="#tab2" class="m-tabs__tab">Tab 2</a>
+    <a href="#tab3" class="m-tabs__tab">Tab 3</a>
+</nav>
+
+Styleguide: Components.Tabs
+*/
+.m-tabs {
+    display: flex;
+    column-gap: 10px;
+    flex-flow: row;
+
+    &__tab {
+        display: inline-block;
+        border: 1px solid transparent;
+        padding: 5px 17px;
+        color: inherit;
+        text-decoration: none;
+        background-color: var(--panel-bg);
+        border-radius: 18px;
+
+        &:hover {
+            border-color: var(--theme-tint);
+        }
+
+        &[aria-selected="true"] {
+            color: white;
+            background-color: var(--theme-tint);
+        }
+    }
+}

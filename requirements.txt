@@ -66,6 +66,10 @@ email-reply-parser==0.5.12
     # via -r requirements.in
 et-xmlfile==2.0.0
     # via openpyxl
+factory-boy==3.3.3
+    # via pytest-factoryboy
+faker==37.6.0
+    # via factory-boy
 greenlet==3.2.3
     # via sqlalchemy
 h11==0.16.0
@@ -83,6 +87,8 @@ idna==3.10
     #   anyio
     #   httpx
     #   requests
+inflection==0.5.1
+    # via pytest-factoryboy
 iniconfig==2.1.0
     # via pytest
 jiter==0.10.0
@@ -132,6 +138,7 @@ packaging==25.0
     #   langchain-core
     #   langsmith
     #   pytest
+    #   pytest-factoryboy
 pandas==2.3.1
     # via -r requirements.in
 pgvector==0.4.1
@@ -162,7 +169,10 @@ pytest==8.4.1
     # via
     #   -r requirements.in
     #   pytest-django
+    #   pytest-factoryboy
 pytest-django==4.11.1
+    # via -r requirements.in
+pytest-factoryboy==2.8.1
     # via -r requirements.in
 python-dateutil==2.9.0.post0
     # via
@@ -228,6 +238,7 @@ typing-extensions==4.14.1
     #   psycopg
     #   pydantic
     #   pydantic-core
+    #   pytest-factoryboy
     #   python-docx
     #   python-pptx
     #   sqlalchemy
@@ -236,6 +247,7 @@ typing-inspection==0.4.1
     # via pydantic
 tzdata==2025.2
     # via
+    #   faker
     #   kombu
     #   pandas
 urllib3==2.5.0

@@ -19,3 +19,8 @@ class CaseLitigantFactory(factory.django.DjangoModelFactory):
 class ChatThreadFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "poc.ChatThread"
+
+
+class ChatMessageFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "poc.ChatMessage"

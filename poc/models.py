@@ -338,7 +338,7 @@ class Case(TimestampedModel):
     litigants = models.ManyToManyField(
         Litigant, related_name="cases", through="CaseLitigant"
     )
-    case_number = models.CharField(max_length=64, unique=True, blank=True)
+    case_number = models.CharField(max_length=64, unique=True, blank=True, null=True)
 
     class Meta:
         db_table = "poc_cases"

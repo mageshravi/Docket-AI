@@ -9,6 +9,8 @@ from langchain.schema import HumanMessage, SystemMessage
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_openai import ChatOpenAI
 
+from poc.models import ChatMessage
+
 from .chat_history import DjangoChatMessageHistory
 from .tools import cases, emails, files
 
@@ -102,7 +104,7 @@ def get_agent_with_history(thread_id: int):
     return agent_with_history
 
 
-def send_message(thread_id: int, user_input: str) -> str:
+def send_message(thread_id: int, user_input: str) -> list[ChatMessage]:
     """
     Send a message to a specific chat thread and return the AI response.
 
@@ -111,16 +113,24 @@ def send_message(thread_id: int, user_input: str) -> str:
         user_input (str): The user message to send.
 
     Returns:
-        str: The AI response.
+        list[ChatMessage]: The saved Human message and its AI response.
     """
 
     config = {"configurable": {"session_id": str(thread_id)}}
+
+    # ? Why are we saving the messages manually?
+    # Generally, we don't need to manually call the add_user_message and add_ai_message methods,
+    # as the RunnableWithMessageHistory object will handle this automatically.
+    # However, to reliably return the newly created human and ai messages,
+    # we use the persist_user_message and persist_ai_message methods.
 
     # fetch the history object for this session
     history = get_history(str(thread_id))
 
     # add the user’s message
-    history.add_user_message(user_input)
+    # the built-in add_user_message returns None.
+    # so using the persist_user_message method directly
+    user_message = history.persist_user_message(user_input)
 
     result = get_agent_with_history(thread_id).invoke(
         {"input": user_input},
@@ -128,6 +138,8 @@ def send_message(thread_id: int, user_input: str) -> str:
     )
 
     # add the AI response
-    history.add_ai_message(result["output"])
+    # the built-in add_ai_message returns None.
+    # so using the persist_ai_message method directly
+    ai_message = history.persist_ai_message(result["output"])
 
-    return result["output"]
+    return [user_message, ai_message]

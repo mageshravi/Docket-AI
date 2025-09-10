@@ -28,27 +28,33 @@ class DjangoChatMessageHistory(BaseChatMessageHistory):
 
         return formatted
 
-    def add_user_message(self, message: str) -> None:
-        ChatMessage.objects.create(
+    def persist_user_message(self, message: str) -> ChatMessage:
+        """
+        Persist a user message and return the created ChatMessage instance.
+        Adding this extra method to NOT change the return type of add_user_message.
+        """
+        return ChatMessage.objects.create(
             thread=self.thread, role=ChatMessage.Role.USER, content=message
         )
 
-    def add_ai_message(self, message: str) -> None:
-        ChatMessage.objects.create(
+    def persist_ai_message(self, message: str) -> ChatMessage:
+        """
+        Persist an AI message and return the created ChatMessage instance.
+        Adding this extra method to NOT change the return type of add_ai_message.
+        """
+        return ChatMessage.objects.create(
             thread=self.thread, role=ChatMessage.Role.AI, content=message
         )
 
-    def add_message(self, message):
-        role = (
-            ChatMessage.Role.USER
-            if isinstance(message, HumanMessage)
-            else ChatMessage.Role.AI
-        )
-        ChatMessage.objects.create(
-            thread=self.thread,
-            role=role,
-            content=message.content,
-        )
+    def add_message(self, message) -> None:
+        # if isinstance(message, HumanMessage):
+        #     self.persist_user_message(message.content)
+        # elif isinstance(message, AIMessage):
+        #     self.persist_ai_message(message.content)
+        # ? Why no-op?
+        # To prevent double saving in database.
+        # See send_message in poc/langchain/chat_agent.py for more details.
+        pass
 
     def clear(self):
         self.thread.messages.all().delete()

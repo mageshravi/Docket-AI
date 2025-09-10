@@ -8,6 +8,7 @@ from poc.models import Case, Litigant, LitigantRole
 from poc.tests.factories import (
     CaseFactory,
     CaseLitigantFactory,
+    ChatMessageFactory,
     ChatThreadFactory,
     LitigantFactory,
 )
@@ -16,6 +17,7 @@ register(LitigantFactory)
 register(CaseFactory)
 register(CaseLitigantFactory)
 register(ChatThreadFactory)
+register(ChatMessageFactory)
 
 
 @pytest.fixture()
@@ -77,7 +79,6 @@ def cases(
     case1 = case_factory.create(
         title="Roma Housing Ltd. vs Vekkey Enterprises",
         description="A civil suit for recovery of dues.",
-        case_number="",
     )
 
     case_litigant_factory.create(

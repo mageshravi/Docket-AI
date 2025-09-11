@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListCreateAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,12 +11,12 @@ from poc.api.serializers import (
     UploadedFileSerializer,
 )
 from poc.langchain.chat_agent import send_message
-from poc.models import Case, ChatThread, UploadedFile
+from poc.models import Case, ChatMessage, ChatThread, UploadedFile
 
 __all__ = [
     "ListCreateUploadedFileAPI",
     "ListCreateThreadAPI",
-    "CreateMessageAPI",
+    "ListCreateMessageAPI",
 ]
 
 
@@ -39,8 +40,46 @@ class ListCreateThreadAPI(ListCreateAPIView):
         serializer.save(case=case)
 
 
-class CreateMessageAPI(APIView):
+class ListCreateMessageAPI(APIView):
     permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
+
+    @property
+    def paginator(self):
+        if not hasattr(self, "_paginator"):
+            if self.pagination_class is None:
+                self._paginator = None
+            else:
+                self._paginator = self.pagination_class()
+
+        return self._paginator
+
+    def paginate_queryset(self, queryset):
+        if self.paginator is None:
+            return None
+
+        return self.paginator.paginate_queryset(queryset, self.request, view=self)
+
+    def get_paginated_response(self, data):
+        assert self.paginator is not None
+        return self.paginator.get_paginated_response(data)
+
+    def get_queryset(self):
+        case_uuid = self.kwargs.get("case_uuid")
+        thread_uuid = self.kwargs.get("thread_uuid")
+        return ChatMessage.objects.filter(
+            thread__uuid=thread_uuid, thread__case__uuid=case_uuid
+        ).order_by("-id")
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = ChatMessageSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = ChatMessageSerializer(queryset, many=True)
+        return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
         # validate case and thread

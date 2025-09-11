@@ -1,7 +1,7 @@
 from django.urls import path
 
 from poc.api.views import (
-    CreateMessageAPI,
+    ListCreateMessageAPI,
     ListCreateThreadAPI,
     ListCreateUploadedFileAPI,
 )
@@ -16,7 +16,7 @@ urlpatterns = [
     ),
     path(
         "cases/<uuid:case_uuid>/chat-threads/<uuid:thread_uuid>/messages/",
-        CreateMessageAPI.as_view(),
+        ListCreateMessageAPI.as_view(),
         name="chat_messages",
     ),
 ]

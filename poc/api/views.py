@@ -1,11 +1,12 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from poc.api.serializers import (
+    CaseSerializer,
     ChatMessageSerializer,
     ChatThreadSerializer,
     UploadedFileSerializer,
@@ -14,10 +15,19 @@ from poc.langchain.chat_agent import send_message
 from poc.models import Case, ChatMessage, ChatThread, UploadedFile
 
 __all__ = [
+    "CaseDetailAPI",
     "ListCreateUploadedFileAPI",
     "ListCreateThreadAPI",
     "ListCreateMessageAPI",
 ]
+
+
+class CaseDetailAPI(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Case.objects.all()
+    lookup_field = "uuid"
+    lookup_url_kwarg = "case_uuid"
+    serializer_class = CaseSerializer
 
 
 class ListCreateUploadedFileAPI(ListCreateAPIView):

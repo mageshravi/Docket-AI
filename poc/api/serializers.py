@@ -1,11 +1,23 @@
 from rest_framework.serializers import ModelSerializer
 
-from poc.models import ChatMessage, ChatThread, UploadedFile
+from poc.models import Case, ChatMessage, ChatThread, UploadedFile
 
 __all__ = [
+    "CaseSerializer",
     "UploadedFileSerializer",
     "ChatThreadSerializer",
 ]
+
+
+class CaseSerializer(ModelSerializer):
+    class Meta:
+        model = Case
+        exclude = ("litigants",)
+        read_only_fields = (
+            "uuid",
+            "created_at",
+            "updated_at",
+        )
 
 
 class UploadedFileSerializer(ModelSerializer):

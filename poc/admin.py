@@ -27,6 +27,7 @@ class CaseAdmin(admin.ModelAdmin):
     list_display = ("id", "case_number", "title", "created_at")
     list_display_links = ("title",)
     search_fields = ("case_number", "title")
+    readonly_fields = ("uuid",)
     ordering = ("-id",)
     inlines = (CaseLitigantInline,)
 

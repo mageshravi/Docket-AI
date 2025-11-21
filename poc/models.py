@@ -46,6 +46,9 @@ class UploadedFile(TimestampedModel):
         max_length=20, choices=Status.choices, default=Status.PENDING
     )
     error_message = models.TextField(blank=True)
+    case = models.ForeignKey(
+        "Case", on_delete=models.CASCADE, related_name="uploaded_files"
+    )
 
     class Meta:
         db_table = "poc_uploaded_files"

@@ -1,11 +1,18 @@
 import uuid
 
 from django.db import models
+from django.utils.timezone import now
 from pgvector.django import HnswIndex, VectorField
 
 from core.models import TimestampedModel
 
 from .validators import FileValidator
+
+
+def get_file_upload_path(instance, filename):
+    """Generate file upload path based on case ID and current date."""
+    today = now().date().strftime("%Y%m%d")
+    return f"poc/uploaded_files/case_{instance.case.id}/{today}_{filename}"
 
 
 class UploadedFile(TimestampedModel):
@@ -38,14 +45,18 @@ class UploadedFile(TimestampedModel):
         allowed_mime_types=allowed_file_types,
     )
 
+    filename = models.CharField(max_length=255, blank=True)
     file = models.FileField(
-        upload_to="poc/uploaded_files/",
+        upload_to=get_file_upload_path,
         validators=[file_validator],
     )
     status = models.CharField(
         max_length=20, choices=Status.choices, default=Status.PENDING
     )
     error_message = models.TextField(blank=True)
+    case = models.ForeignKey(
+        "Case", on_delete=models.CASCADE, related_name="uploaded_files"
+    )
 
     class Meta:
         db_table = "poc_uploaded_files"

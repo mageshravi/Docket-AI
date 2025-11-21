@@ -1,0 +1,86 @@
+/*
+Pagination
+
+Markup:
+<ul class="m-pagination">
+    <li class="m-pagination__item m-pagination__item--first">
+        <a class="m-pagination__link first" href="#">1</a>
+    </li>
+
+    <li class="m-pagination__item">
+        <a class="m-pagination__link previous" href="#">4</a>
+    </li>
+
+    <li class="m-pagination__item">
+        <a class="m-pagination__link current" href="#">5</a>
+    </li>
+
+    <li class="m-pagination__item">
+        <a class="m-pagination__link next" href="#">6</a>
+    </li>
+
+    <li class="m-pagination__item m-pagination__item--last">
+        <a class="m-pagination__link last" href="#">10</a>
+    </li>
+</ul>
+
+Styleguide Components.Pagination
+*/
+.m-pagination {
+    --btn-bg: lightgray;
+    --btn-bg--hover: darkgray;
+    --btn-bg--active: gray;
+    --btn-bg--primary: #3BB4C1;
+    --btn-bg--primary-hover: #34A0AD;
+    --btn-bg--primary-active: #2B8C97;
+    --btn-bg--secondary: white;
+    --btn-bg--secondary-hover: #E8F7F9;
+    --btn-bg--secondary-active: #D0EEF1;
+    --btn-txt: black;
+    --btn-txt--active: white;
+    --btn-txt--primary: white;
+    --btn-txt--secondary: #3BB4C1;
+    --btn-txt--secondary-hover: #34A0AD;
+    --btn-txt--secondary-active: #2B8C97;
+
+    display: flex;
+    column-gap: 14px;
+    justify-content: center;
+    margin-inline: 18px;
+    padding: 0;
+    list-style: none;
+
+    &__item {
+        &.is-hidden {
+            visibility: hidden;
+        }
+
+        &--first {
+            margin-inline-end: 30px;
+        }
+
+        &--last {
+            margin-inline-start: 30px;
+        }
+    }
+
+    &__link {
+        display: inline-block;
+        min-width: 44px;
+        border: 1px solid;
+        padding: 10px;
+        color: var(--btn-txt--secondary);
+        text-align: center;
+        text-decoration: none;
+        border-radius: 6px;
+
+        &:hover {
+            background-color: var(--btn-bg--secondary-hover);
+        }
+
+        &.current {
+            color: var(--btn-txt--active);
+            background-color: var(--btn-bg--primary-active);
+        }
+    }
+}

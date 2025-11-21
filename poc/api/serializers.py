@@ -31,6 +31,18 @@ class UploadedFileSerializer(ModelSerializer):
             "updated_at",
         )
 
+    def create(self, validated_data):
+        uploaded_file = validated_data.get("file")
+        if uploaded_file:
+            validated_data["filename"] = uploaded_file.name
+
+        return super().create(validated_data)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["case"] = str(instance.case.uuid) if instance.case else None
+        return representation
+
 
 class ChatThreadSerializer(ModelSerializer):
     class Meta:

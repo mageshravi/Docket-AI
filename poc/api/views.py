@@ -33,7 +33,15 @@ class CaseDetailAPI(RetrieveAPIView):
 class ListCreateUploadedFileAPI(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UploadedFileSerializer
-    queryset = UploadedFile.objects.all().order_by("-id")
+
+    def get_queryset(self):
+        case_uuid = self.kwargs.get("case_uuid")
+        return UploadedFile.objects.filter(case__uuid=case_uuid).order_by("-id")
+
+    def perform_create(self, serializer):
+        case_uuid = self.kwargs.get("case_uuid")
+        case = get_object_or_404(Case, uuid=case_uuid)
+        serializer.save(case=case)
 
 
 class ListCreateThreadAPI(ListCreateAPIView):

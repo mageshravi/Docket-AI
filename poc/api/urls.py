@@ -5,6 +5,7 @@ from poc.api.views import (
     ListCreateMessageAPI,
     ListCreateThreadAPI,
     ListCreateUploadedFileAPI,
+    RetrieveUploadedFileAPI,
 )
 
 app_name = "poc"
@@ -13,6 +14,11 @@ urlpatterns = [
         "cases/<uuid:case_uuid>/exhibits/",
         ListCreateUploadedFileAPI.as_view(),
         name="exhibits",
+    ),
+    path(
+        "cases/<uuid:case_uuid>/exhibits/<int:id>/",
+        RetrieveUploadedFileAPI.as_view(),
+        name="exhibit_detail",
     ),
     path("cases/<uuid:case_uuid>/", CaseDetailAPI.as_view(), name="case_detail"),
     path(

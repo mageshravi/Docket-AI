@@ -17,6 +17,7 @@ from poc.models import Case, ChatMessage, ChatThread, UploadedFile
 __all__ = [
     "CaseDetailAPI",
     "ListCreateUploadedFileAPI",
+    "RetrieveUploadedFileAPI",
     "ListCreateThreadAPI",
     "ListCreateMessageAPI",
 ]
@@ -42,6 +43,17 @@ class ListCreateUploadedFileAPI(ListCreateAPIView):
         case_uuid = self.kwargs.get("case_uuid")
         case = get_object_or_404(Case, uuid=case_uuid)
         serializer.save(case=case)
+
+
+class RetrieveUploadedFileAPI(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UploadedFileSerializer
+    lookup_field = "id"
+    lookup_url_kwarg = "id"
+
+    def get_queryset(self):
+        case_uuid = self.kwargs.get("case_uuid")
+        return UploadedFile.objects.filter(case__uuid=case_uuid)
 
 
 class ListCreateThreadAPI(ListCreateAPIView):

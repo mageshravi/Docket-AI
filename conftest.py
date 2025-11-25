@@ -11,6 +11,7 @@ from poc.tests.factories import (
     ChatMessageFactory,
     ChatThreadFactory,
     LitigantFactory,
+    UploadedFileFactory,
 )
 
 register(LitigantFactory)
@@ -18,6 +19,7 @@ register(CaseFactory)
 register(CaseLitigantFactory)
 register(ChatThreadFactory)
 register(ChatMessageFactory)
+register(UploadedFileFactory)
 
 
 @pytest.fixture()
@@ -95,3 +97,20 @@ def cases(
     )
 
     return {"mahadevan_vs_gopalan": case1}
+
+
+@pytest.fixture()
+def uploaded_files(db, uploaded_file_factory, cases) -> list:
+    extensions = ["pdf", "docx", "xlsx", "pptx", "txt"]
+    files = []
+    for i in range(5):
+        odd_even = "odd" if i % 2 == 0 else "even"
+        filename = f"exhibit_{i + 1}_{odd_even}.{extensions[i]}"
+        uploaded_file = uploaded_file_factory.create(
+            filename=filename,
+            file=f"/path/to/{filename}",
+            case=cases["mahadevan_vs_gopalan"],
+        )
+        files.append(uploaded_file)
+
+    return files

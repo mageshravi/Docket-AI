@@ -24,3 +24,8 @@ class ChatThreadFactory(factory.django.DjangoModelFactory):
 class ChatMessageFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "poc.ChatMessage"
+
+
+class UploadedFileFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "poc.UploadedFile"

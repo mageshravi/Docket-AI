@@ -37,7 +37,17 @@ class ListCreateUploadedFileAPI(ListCreateAPIView):
 
     def get_queryset(self):
         case_uuid = self.kwargs.get("case_uuid")
-        return UploadedFile.objects.filter(case__uuid=case_uuid).order_by("-id")
+        queryset = UploadedFile.objects.filter(case__uuid=case_uuid).order_by("-id")
+
+        # check for query param 'search'
+        search = self.request.query_params.get("search")
+        if search:
+            if len(search.strip()) > 2:
+                queryset = queryset.filter(file__icontains=search)
+            else:
+                queryset = queryset.none()
+
+        return queryset
 
     def perform_create(self, serializer):
         case_uuid = self.kwargs.get("case_uuid")

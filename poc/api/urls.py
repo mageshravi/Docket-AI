@@ -2,6 +2,7 @@ from django.urls import path
 
 from poc.api.views import (
     CaseDetailAPI,
+    ListCreateLitigantAPI,
     ListCreateMessageAPI,
     ListCreateThreadAPI,
     ListCreateUploadedFileAPI,
@@ -30,5 +31,10 @@ urlpatterns = [
         "cases/<uuid:case_uuid>/chat-threads/<uuid:thread_uuid>/messages/",
         ListCreateMessageAPI.as_view(),
         name="chat_messages",
+    ),
+    path(
+        "litigants/",
+        ListCreateLitigantAPI.as_view(),
+        name="litigants",
     ),
 ]

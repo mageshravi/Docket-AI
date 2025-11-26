@@ -1,12 +1,24 @@
 from rest_framework.serializers import ModelSerializer
 
-from poc.models import Case, ChatMessage, ChatThread, UploadedFile
+from poc.models import Case, ChatMessage, ChatThread, Litigant, UploadedFile
 
 __all__ = [
+    "LitigantSerializer",
     "CaseSerializer",
     "UploadedFileSerializer",
     "ChatThreadSerializer",
 ]
+
+
+class LitigantSerializer(ModelSerializer):
+    class Meta:
+        model = Litigant
+        fields = "__all__"
+        read_only_fields = (
+            "id",
+            "created_at",
+            "updated_at",
+        )
 
 
 class CaseSerializer(ModelSerializer):

@@ -9,10 +9,11 @@ from poc.api.serializers import (
     CaseSerializer,
     ChatMessageSerializer,
     ChatThreadSerializer,
+    LitigantSerializer,
     UploadedFileSerializer,
 )
 from poc.langchain.chat_agent import send_message
-from poc.models import Case, ChatMessage, ChatThread, UploadedFile
+from poc.models import Case, ChatMessage, ChatThread, Litigant, UploadedFile
 
 __all__ = [
     "CaseDetailAPI",
@@ -20,6 +21,7 @@ __all__ = [
     "RetrieveUploadedFileAPI",
     "ListCreateThreadAPI",
     "ListCreateMessageAPI",
+    "ListCreateLitigantAPI",
 ]
 
 
@@ -137,3 +139,11 @@ class ListCreateMessageAPI(APIView):
         )
         op_serializer = ChatMessageSerializer(messages, many=True)
         return Response(op_serializer.data, status=201)
+
+
+class ListCreateLitigantAPI(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = LitigantSerializer
+
+    def get_queryset(self):
+        return Litigant.objects.all().order_by("-id")

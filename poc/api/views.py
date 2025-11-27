@@ -23,6 +23,7 @@ __all__ = [
     "ListCreateThreadAPI",
     "ListCreateMessageAPI",
     "ListCreateLitigantAPI",
+    "RetrieveLitigantAPI",
 ]
 
 
@@ -162,3 +163,13 @@ class ListCreateLitigantAPI(ListCreateAPIView):
                 return Litigant.objects.none()
 
         return Litigant.objects.all().order_by("-id")
+
+
+class RetrieveLitigantAPI(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = LitigantSerializer
+    lookup_field = "id"
+    lookup_url_kwarg = "id"
+
+    def get_queryset(self):
+        return Litigant.objects.all()

@@ -6,6 +6,7 @@ from poc.api.views import (
     ListCreateMessageAPI,
     ListCreateThreadAPI,
     ListCreateUploadedFileAPI,
+    RetrieveLitigantAPI,
     RetrieveUploadedFileAPI,
 )
 
@@ -36,5 +37,10 @@ urlpatterns = [
         "litigants/",
         ListCreateLitigantAPI.as_view(),
         name="litigants",
+    ),
+    path(
+        "litigants/<int:id>/",
+        RetrieveLitigantAPI.as_view(),
+        name="litigant_detail",
     ),
 ]

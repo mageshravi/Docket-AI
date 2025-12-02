@@ -7,3 +7,6 @@ python_files = ["tests.py", "tests/*.py"]
 [tool.djlint]
 blank_line_after_tag = "extends,include,endblock"
 max_blank_lines = 1
+[tool.coverage.run]
+source = ["core", "poc"]
+omit = ["*/migrations/*", "*/tests/*"]

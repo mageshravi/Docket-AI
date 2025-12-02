@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from poc.api.serializers import (
+    CaseCompactSerializer,
     CaseSerializer,
     ChatMessageSerializer,
     ChatThreadSerializer,
@@ -17,7 +18,8 @@ from poc.langchain.chat_agent import send_message
 from poc.models import Case, ChatMessage, ChatThread, Litigant, UploadedFile
 
 __all__ = [
-    "CaseDetailAPI",
+    "ListCreateCaseAPI",
+    "RetrieveCaseAPI",
     "ListCreateUploadedFileAPI",
     "RetrieveUploadedFileAPI",
     "ListCreateThreadAPI",
@@ -27,12 +29,20 @@ __all__ = [
 ]
 
 
-class CaseDetailAPI(RetrieveAPIView):
+class ListCreateCaseAPI(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CaseSerializer
+
+    def get_queryset(self):
+        return Case.objects.all().order_by("-id")
+
+
+class RetrieveCaseAPI(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Case.objects.all()
     lookup_field = "uuid"
     lookup_url_kwarg = "case_uuid"
-    serializer_class = CaseSerializer
+    serializer_class = CaseCompactSerializer
 
 
 class ListCreateUploadedFileAPI(ListCreateAPIView):

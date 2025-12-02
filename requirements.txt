@@ -41,6 +41,8 @@ click-plugins==1.1.1.2
     # via celery
 click-repl==0.3.0
     # via celery
+coverage[toml]==7.12.0
+    # via pytest-cov
 debugpy==1.8.15
     # via -r requirements.in
 distro==1.9.0
@@ -146,7 +148,9 @@ pgvector==0.4.1
 pillow==11.3.0
     # via python-pptx
 pluggy==1.6.0
-    # via pytest
+    # via
+    #   pytest
+    #   pytest-cov
 prompt-toolkit==3.0.51
     # via click-repl
 psycopg[binary]==3.2.9
@@ -168,8 +172,11 @@ pypdf==5.9.0
 pytest==8.4.1
     # via
     #   -r requirements.in
+    #   pytest-cov
     #   pytest-django
     #   pytest-factoryboy
+pytest-cov==7.0.0
+    # via -r requirements.in
 pytest-django==4.11.1
     # via -r requirements.in
 pytest-factoryboy==2.8.1

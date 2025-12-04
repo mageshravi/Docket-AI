@@ -34,7 +34,19 @@ class ListCreateCaseAPI(ListCreateAPIView):
     serializer_class = CaseSerializer
 
     def get_queryset(self):
-        return Case.objects.all().order_by("-id")
+        queryset = Case.objects.all().order_by("-id")
+
+        # check for query param 'search'
+        search = self.request.query_params.get("search")
+        if search:
+            if len(search.strip()) > 2:
+                queryset = queryset.filter(
+                    Q(title__icontains=search) | Q(case_number__istartswith=search)
+                )
+            else:
+                queryset = queryset.none()
+
+        return queryset
 
 
 class RetrieveCaseAPI(RetrieveAPIView):

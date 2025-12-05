@@ -1,5 +1,7 @@
+import re
 import uuid
 
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.timezone import now
 from pgvector.django import HnswIndex, VectorField
@@ -44,6 +46,11 @@ class UploadedFile(TimestampedModel):
         max_size_mb=10,
         allowed_mime_types=allowed_file_types,
     )
+    exhibit_code_validator = RegexValidator(
+        regex=r"^[A-Z][A-Z0-9-/.()]*[1-9)]$",
+        flags=re.IGNORECASE,
+        message="Can only contain uppercase letters, numbers, and special characters - / . ( ). Must start with a letter and end with a number or ).",
+    )
 
     filename = models.CharField(max_length=255, blank=True)
     file = models.FileField(
@@ -57,9 +64,16 @@ class UploadedFile(TimestampedModel):
     case = models.ForeignKey(
         "Case", on_delete=models.CASCADE, related_name="uploaded_files"
     )
+    exhibit_code = models.CharField(
+        max_length=32,
+        blank=True,
+        null=True,
+        validators=[exhibit_code_validator],
+    )
 
     class Meta:
         db_table = "poc_uploaded_files"
+        unique_together = (("case", "exhibit_code"),)
 
     def __str__(self):
         return self.file.name

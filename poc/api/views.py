@@ -1,6 +1,10 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveAPIView,
+    RetrieveUpdateAPIView,
+)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -21,7 +25,7 @@ __all__ = [
     "ListCreateCaseAPI",
     "RetrieveCaseAPI",
     "ListCreateUploadedFileAPI",
-    "RetrieveUploadedFileAPI",
+    "RetrieveUpdateUploadedFileAPI",
     "ListCreateThreadAPI",
     "ListCreateMessageAPI",
     "ListCreateLitigantAPI",
@@ -81,7 +85,7 @@ class ListCreateUploadedFileAPI(ListCreateAPIView):
         serializer.save(case=case)
 
 
-class RetrieveUploadedFileAPI(RetrieveAPIView):
+class RetrieveUpdateUploadedFileAPI(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UploadedFileSerializer
     lookup_field = "id"
@@ -90,6 +94,15 @@ class RetrieveUploadedFileAPI(RetrieveAPIView):
     def get_queryset(self):
         case_uuid = self.kwargs.get("case_uuid")
         return UploadedFile.objects.filter(case__uuid=case_uuid)
+
+    def partial_update(self, request, *args, **kwargs):
+        # can only update the 'exhibit_code' field
+        if "exhibit_code" not in request.data or len(request.data) != 1:
+            return Response(
+                {"detail": "Only 'exhibit_code' field can be updated."}, status=400
+            )
+
+        return super().partial_update(request, *args, **kwargs)
 
 
 class ListCreateThreadAPI(ListCreateAPIView):

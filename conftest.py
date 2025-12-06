@@ -110,6 +110,7 @@ def uploaded_files(db, uploaded_file_factory, cases) -> list:
             filename=filename,
             file=f"/path/to/{filename}",
             case=cases["mahadevan_vs_gopalan"],
+            exhibit_code=f"P-{i + 1}",
         )
         files.append(uploaded_file)
 

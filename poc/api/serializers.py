@@ -1,4 +1,7 @@
-from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
+from rest_framework.serializers import (
+    ModelSerializer,
+    PrimaryKeyRelatedField,
+)
 
 from poc.models import (
     Case,

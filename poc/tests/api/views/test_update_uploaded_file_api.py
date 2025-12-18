@@ -30,7 +30,7 @@ def test_set_duplicate_exhibit_code(api_client, users, uploaded_files):
     api_client.force_authenticate(user=users["user1"])
     response = api_client.patch(url, data={"exhibit_code": uploaded_file1.exhibit_code})
     assert response.status_code == 400
-    assert "non_field_errors" in response.data
+    assert "exhibit_code" in response.data
 
 
 def test_set_invalid_exhibit_code(api_client, users, uploaded_files):
@@ -46,10 +46,10 @@ def test_set_exhibit_code(api_client, users, uploaded_files):
     uploaded_file = uploaded_files[0]
     url = _get_api_url(uploaded_file.case.uuid, uploaded_file.id)
     api_client.force_authenticate(user=users["user1"])
-    response = api_client.patch(url, data={"exhibit_code": "P-1"})
+    response = api_client.patch(url, data={"exhibit_code": "P-101"})
     assert response.status_code == 200
     assert response.data["id"] == uploaded_file.id
-    assert response.data["exhibit_code"] == "P-1"
+    assert response.data["exhibit_code"] == "P-101"
 
 
 def test_unset_exhibit_code(api_client, users, uploaded_files):

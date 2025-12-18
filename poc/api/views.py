@@ -105,6 +105,17 @@ class RetrieveUpdateUploadedFileAPI(RetrieveUpdateAPIView):
         case_uuid = self.kwargs.get("case_uuid")
         return UploadedFile.objects.filter(case__uuid=case_uuid)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+
+        if self.request.method == "PATCH":
+            # pass 'case' in context for update
+            case_uuid = self.kwargs.get("case_uuid")
+            case = get_object_or_404(Case, uuid=case_uuid)
+            context["case"] = case
+
+        return context
+
     def partial_update(self, request, *args, **kwargs):
         # can only update the 'exhibit_code' field
         if "exhibit_code" not in request.data or len(request.data) != 1:

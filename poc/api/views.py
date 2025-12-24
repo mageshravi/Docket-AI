@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveAPIView,
-    RetrieveUpdateAPIView,
+    RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -25,7 +25,7 @@ __all__ = [
     "ListCreateCaseAPI",
     "RetrieveCaseAPI",
     "ListCreateUploadedFileAPI",
-    "RetrieveUpdateUploadedFileAPI",
+    "RetrieveUpdateDestroyUploadedFileAPI",
     "ListCreateThreadAPI",
     "ListCreateMessageAPI",
     "ListCreateLitigantAPI",
@@ -67,7 +67,9 @@ class ListCreateUploadedFileAPI(ListCreateAPIView):
 
     def get_queryset(self):
         case_uuid = self.kwargs.get("case_uuid")
-        queryset = UploadedFile.objects.filter(case__uuid=case_uuid).order_by("-id")
+        queryset = UploadedFile.active_objects.filter(case__uuid=case_uuid).order_by(
+            "-id"
+        )
 
         # check for query param 'search'
         search = self.request.query_params.get("search")
@@ -95,7 +97,7 @@ class ListCreateUploadedFileAPI(ListCreateAPIView):
         serializer.save(case=case)
 
 
-class RetrieveUpdateUploadedFileAPI(RetrieveUpdateAPIView):
+class RetrieveUpdateDestroyUploadedFileAPI(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UploadedFileSerializer
     lookup_field = "id"
@@ -103,7 +105,7 @@ class RetrieveUpdateUploadedFileAPI(RetrieveUpdateAPIView):
 
     def get_queryset(self):
         case_uuid = self.kwargs.get("case_uuid")
-        return UploadedFile.objects.filter(case__uuid=case_uuid)
+        return UploadedFile.active_objects.filter(case__uuid=case_uuid)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -124,6 +126,12 @@ class RetrieveUpdateUploadedFileAPI(RetrieveUpdateAPIView):
             )
 
         return super().partial_update(request, *args, **kwargs)
+
+    def perform_destroy(self, instance):
+        # 1. delete the related embeddings if any
+        instance.uploaded_file_embeddings.all().delete()
+        # 2. soft delete the uploaded file
+        instance.mark_as_deleted()
 
 
 class ListCreateThreadAPI(ListCreateAPIView):

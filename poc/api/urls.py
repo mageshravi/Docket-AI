@@ -8,7 +8,7 @@ from poc.api.views import (
     ListCreateUploadedFileAPI,
     RetrieveCaseAPI,
     RetrieveLitigantAPI,
-    RetrieveUpdateUploadedFileAPI,
+    RetrieveUpdateDestroyUploadedFileAPI,
 )
 
 app_name = "poc"
@@ -22,7 +22,7 @@ urlpatterns = [
     ),
     path(
         "cases/<uuid:case_uuid>/exhibits/<int:id>/",
-        RetrieveUpdateUploadedFileAPI.as_view(),
+        RetrieveUpdateDestroyUploadedFileAPI.as_view(),
         name="exhibit_detail",
     ),
     path(

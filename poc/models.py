@@ -8,6 +8,7 @@ from pgvector.django import HnswIndex, VectorField
 
 from core.models import TimestampedModel
 
+from .managers import ActiveUploadedFilesManager
 from .validators import FileValidator
 
 
@@ -42,6 +43,11 @@ class UploadedFile(TimestampedModel):
         "message/rfc822",  # for EML files
     ]
 
+    objects = models.Manager()  # The default manager.
+    active_objects = (
+        ActiveUploadedFilesManager()
+    )  # Manager to return only non-deleted files
+
     file_validator = FileValidator(
         max_size_mb=10,
         allowed_mime_types=allowed_file_types,
@@ -70,6 +76,7 @@ class UploadedFile(TimestampedModel):
         null=True,
         validators=[exhibit_code_validator],
     )
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         db_table = "poc_uploaded_files"
@@ -101,6 +108,16 @@ class UploadedFile(TimestampedModel):
             self.error_message = error_message
 
         self.save(update_fields=["status", "error_message"])
+
+    def mark_as_deleted(self):
+        if self.is_deleted:
+            return
+
+        # Delete the file from storage
+        self.file.delete(save=False)
+        # Update the flag
+        self.is_deleted = True
+        self.save(update_fields=["is_deleted", "file"])
 
 
 class ParsedEmail(TimestampedModel):

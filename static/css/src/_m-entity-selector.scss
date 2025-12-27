@@ -1,0 +1,76 @@
+/*
+Entity Selector
+
+Entity selectors allow users to select one or more saved entities.
+
+Markup:
+<div class="m-entity-selector {{ modifier_class }}">
+    <label for="entity-input">Entities</label>
+    <div class="m-entity-selector__selected-entities">
+        <!-- Selected entities will be rendered here -->
+        <span class="m-entity-tag">
+            Entity 1
+            <span class="m-entity-tag__icon-x"></span>
+        </span>
+        <span class="m-entity-tag">
+            Entity 2
+            <span class="m-entity-tag__icon-x"></span>
+        </span>
+    </div>
+    <button class="m-entity-selector__add-btn">Add Entity</button>
+</div>
+
+Styleguide: Forms.EntitySelectors
+*/
+.m-entity-selector {
+    display: flex;
+    flex-flow: column;
+
+    &__label {
+        margin-block-end: 10px;
+        font-weight: bold;
+        color: var(--label-txt);
+    }
+
+    &__selected-entities {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-block-end: 10px;
+    }
+
+    &__add-btn {
+        display: inline-flex;
+        column-gap: 4px;
+        align-self: flex-start;
+        align-items: center;
+        border: none;
+        padding: 5px 16px 5px 12px;
+        background-color: var(--panel-bg);
+        border-radius: 17px;
+        font-size: 1rem;
+        line-height: 150%;
+        cursor: pointer;
+
+        &::before {
+            --icon-size: 20px;
+
+            content: '';
+            display: inline-block;
+            width: var(--icon-size);
+            height: var(--icon-size);
+            background-size: calc(3 * var(--icon-size)) calc(2 * var(--icon-size));
+            background-image: url('/static/wicons/sprite-entity-icons.svg');
+            background-repeat: no-repeat;
+            background-position: 0 calc(-1 * var(--icon-size));
+        }
+
+        &:hover {
+            background-color: #F6F1DC;
+        }
+
+        &:active {
+            background-color: #E7E2CF;
+        }
+    }
+}

@@ -22,12 +22,13 @@ Styleguide: Forms.EntityTags
     align-items: center;
     padding: 5px 12px 5px 16px;
     background-color: transparent;
-    border: var(--ip-border-width) solid var(--panel-bg);
+    border: var(--ip-border-width) solid var(--ip-border-color);
     border-radius: 17px;
     color: var(--body-txt);
     user-select: none;
 
     &:hover {
+        border-color: var(--panel-bg);
         background-color: var(--panel-bg);
     }
 

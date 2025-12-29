@@ -1,0 +1,64 @@
+/*
+Checkbox
+
+Checkbox allow users to select one or more options from a set.
+
+Markup:
+<div class="m-checkbox m-checkbox--inline {{ modifier_class }}">
+    <input type="checkbox" class="m-checkbox__input" name="checkbox_option_a" id="checkbox-option-a" />
+    <label for="checkbox-option-a" class="m-checkbox__label">Option A</label>
+</div>
+<div class="m-checkbox m-checkbox--inline {{ modifier_class }}">
+    <input type="checkbox" class="m-checkbox__input" name="checkbox_option_b" id="checkbox-option-b" />
+    <label for="checkbox-option-b" class="m-checkbox__label">Option B</label>
+</div>
+
+Styleguide: Forms.Checkboxes
+*/
+.m-checkbox {
+
+    &__input {
+        display: none;
+    }
+
+    &__label {
+        display: flex;
+        align-items: center;
+        column-gap: 8px;
+        font-size: 1rem;
+        line-height: 150%;
+        color: var(--body-txt);
+        cursor: pointer;
+        user-select: none;
+
+        &::before {
+            --icon-size: 24px;
+
+            content: '';
+            display: inline-block;
+            width: var(--icon-size);
+            height: var(--icon-size);
+            background-image: url('/static/wicons/sprite-checkbox-radio-icons.svg');
+            background-size: calc(2 * var(--icon-size)) calc(4 * var(--icon-size));
+            background-repeat: no-repeat;
+            background-position: 0 0;
+        }
+
+        &:hover::before,
+        &.psuedo-class-hover::before,
+        &:focus::before,
+        &.psuedo-class-focus::before {
+            outline: none;
+            background-position-x: calc(-1 * var(--icon-size));
+        }
+    }
+
+    &__input:checked + .m-checkbox__label::before {
+        background-position-y: calc(-1 * var(--icon-size));
+    }
+
+    &--inline {
+        display: inline-block;
+        margin-inline-end: 20px;
+    }
+}

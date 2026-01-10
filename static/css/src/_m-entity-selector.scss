@@ -6,6 +6,7 @@ Entity selectors allow users to select one or more saved entities.
 Markup:
 <div class="m-entity-selector {{ modifier_class }}">
     <label for="entity-input">Entities</label>
+    <span class="m-entity-selector__error-text">Error message here</span>
     <div class="m-entity-selector__selected-entities">
         <!-- Selected entities will be rendered here -->
         <span class="m-entity-tag">
@@ -30,6 +31,11 @@ Styleguide: Forms.EntitySelectors
         margin-block-end: 10px;
         font-weight: bold;
         color: var(--label-txt);
+    }
+
+    &__error-text {
+        font-style: italic;
+        color: var(--error-txt);
     }
 
     &__selected-entities {

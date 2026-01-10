@@ -1,0 +1,66 @@
+/*
+Searchbox
+
+Search input component styles
+
+Markup:
+<div class="m-searchbox {{ modifier_class }}">
+    <input type="search" class="m-searchbox__input" placeholder="Search..." />
+</div>
+
+Styleguide: Forms.Searchbox
+*/
+.m-searchbox {
+    position: relative;
+    border: var(--ip-border-width) solid var(--ip-border-color);
+    background-color: transparent;
+    border-radius: 22px;
+    overflow: hidden;
+
+    &::before {
+        --icon-size: 20px;
+
+        position: absolute;
+        z-index: -1;
+        left: 14px;
+        top: 8px;
+        content: '';
+        display: inline-block;
+        width: var(--icon-size);
+        height: var(--icon-size);
+        background-size: calc(2 * var(--icon-size)) var(--icon-size);
+        background-image: url('/static/wicons/sprite-search-icons.svg');
+        background-repeat: no-repeat;
+        background-position: 0 0;
+    }
+
+    &__input {
+        display: block;
+        border: none;
+        padding: 6px 18px 6px 42px;
+        font-size: 1rem;
+        line-height: 150%;
+        width: 100%;
+        background-color: transparent;
+
+        &:focus {
+            outline: none;
+            padding: 5px 17px 5px 41px; // Adjust padding to account for increased border width
+        }
+
+        &::placeholder {
+            font-family: var(--font-body);
+        }
+    }
+
+    &:has(:focus) {
+        border-width: var(--ip-border-width--focused);
+        border-color: var(--ip-border-color--focused);
+
+        &::before {
+            left: 13px;
+            top: 7px;
+            background-position-x: calc(-1 * var(--icon-size));
+        }
+    }
+}

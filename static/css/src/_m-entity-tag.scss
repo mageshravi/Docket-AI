@@ -1,0 +1,65 @@
+/*
+Entity Tag
+
+Entity tags are used within entity selectors.
+
+Markup:
+<span class="m-entity-tag {{ modifier_class }}">
+    Tag Name
+    <span class="m-entity-tag__icon-x"></span>
+</span>
+
+:hover - Hover state
+:focus - Focus state
+
+Styleguide: Forms.EntityTags
+*/
+.m-entity-tag {
+    position: relative;
+    display: inline-flex;
+    flex-flow: row;
+    column-gap: 8px;
+    align-items: center;
+    padding: 5px 12px 5px 16px;
+    background-color: transparent;
+    border: var(--ip-border-width) solid var(--ip-border-color);
+    border-radius: 17px;
+    color: var(--body-txt);
+    user-select: none;
+
+    &:hover {
+        border-color: var(--panel-bg);
+        background-color: var(--panel-bg);
+    }
+
+    &:has(&__icon-x:active) {
+        border-color: #F6DEDE;
+        background-color: #F6DEDE;
+    }
+
+    &:focus {
+        outline: none;
+        border: 1.5px solid var(--ip-border-color--focused);
+    }
+
+    &__icon-x {
+        display: flex;
+        cursor: pointer;
+
+        &::after {
+            --icon-size: 20px;
+
+            display: inline-block;
+            content: '';
+            width: var(--icon-size);
+            height: var(--icon-size);
+            background-size: calc(3 * var(--icon-size)) calc(2 * var(--icon-size));
+            background-image: url('/static/wicons/sprite-entity-icons.svg');
+            background-repeat: no-repeat;
+        }
+
+        &:hover::after {
+            background-position-x: calc(-1 * var(--icon-size));
+        }
+    }
+}

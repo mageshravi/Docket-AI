@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Case, CaseLitigant, ChatThread, Litigant, UploadedFile
+from .models import Case, CaseLitigant, ChatThread, Litigant, LitigantRole, UploadedFile
 
 
 @admin.register(UploadedFile)
@@ -52,4 +52,12 @@ class ChatThreadAdmin(admin.ModelAdmin):
         "title",
         "case__case_number",
     )
+    ordering = ("-id",)
+
+
+@admin.register(LitigantRole)
+class LitigantRoleAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "handle", "created_at")
+    list_display_links = ("handle",)
+    search_fields = ("name", "handle")
     ordering = ("-id",)

@@ -9,7 +9,7 @@ from pgvector.django import HnswIndex, VectorField
 from core.models import TimestampedModel
 
 from .managers import ActiveUploadedFilesManager
-from .validators import FileValidator
+from .validators import FileValidator, validate_phone_number
 
 
 def get_file_upload_path(instance, filename):
@@ -352,7 +352,9 @@ class Litigant(TimestampedModel):
     name = models.CharField(max_length=255)
     bio = models.CharField(max_length=255)
     email = models.EmailField(blank=True)
-    phone = models.CharField(max_length=20, blank=True)
+    phone = models.CharField(
+        max_length=20, blank=True, validators=[validate_phone_number]
+    )
     address = models.TextField(blank=True)
     notes = models.TextField(blank=True)
 

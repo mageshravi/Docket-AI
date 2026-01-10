@@ -37,7 +37,7 @@ def test_with_all_fields(api_client, users):
         "name": "Jane Doe",
         "bio": "Another dummy user for life",
         "email": "jane.doe@example.com",
-        "phone": "+1234567890",
+        "phone": "+1-234567890",
         "address": "123 Main St, Anytown, USA",
         "notes": "This is a test note.",
     }

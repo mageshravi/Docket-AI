@@ -44,6 +44,7 @@ Styleguide: Forms.Textbox
         padding: 10px 12px;
         background-color: var(--ip-bg);
         color: var(--body-txt);
+        font-family: var(--font-body);
 
         &:focus {
             outline: none;

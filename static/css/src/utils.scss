@@ -4,3 +4,10 @@
         0 4px 4px rgba(0, 0, 0, 0.25),
         0 8px 8px rgba(0, 0, 0, 0.15);
 }
+
+.u-highlight {
+    padding: 2px 4px;
+    color: var(--highlight-txt);
+    background-color: var(--highlight-bg);
+    border-radius: 4px;
+}

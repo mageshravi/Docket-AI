@@ -45,7 +45,7 @@ class ListCreateCaseAPI(ListCreateAPIView):
         if search:
             if len(search.strip()) > 2:
                 queryset = queryset.filter(
-                    Q(title__icontains=search) | Q(case_number__istartswith=search)
+                    Q(title__icontains=search) | Q(case_number__icontains=search)
                 )
             else:
                 queryset = queryset.none()

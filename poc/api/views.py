@@ -55,10 +55,25 @@ class ListCreateCaseAPI(ListCreateAPIView):
 
 class RetrieveCaseAPI(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = Case.objects.all()
     lookup_field = "uuid"
     lookup_url_kwarg = "case_uuid"
-    serializer_class = CaseCompactSerializer
+
+    def get_queryset(self):
+        if self.request.query_params.get("compact") == "true":
+            return Case.objects.all()
+
+        return Case.objects.prefetch_related(
+            "case_litigants__litigant",
+            "case_litigants__role",
+        )
+
+    def get_serializer_class(self):
+        # check for query param 'compact'
+        if self.request.query_params.get("compact") == "true":
+            return CaseCompactSerializer
+
+        # otherwise return full serializer
+        return CaseSerializer
 
 
 class ListCreateUploadedFileAPI(ListCreateAPIView):

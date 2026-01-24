@@ -10,6 +10,8 @@ Markup:
 
 .m-btn--primary - Primary button
 .m-btn--secondary - Secondary button
+.m-btn--link - Link style button
+.m-btn--compact - Compact button
 
 Styleguide: Forms.Buttons
 */
@@ -82,5 +84,13 @@ Styleguide: Forms.Buttons
             background-color: var(--btn-bg--secondary-active);
             color: var(--btn-txt--secondary-active);
         }
+    }
+
+    &--link {
+        text-decoration: none;
+    }
+
+    &--compact {
+        padding: 5px 12px;
     }
 }

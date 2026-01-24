@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveAPIView,
+    RetrieveUpdateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.pagination import PageNumberPagination
@@ -23,7 +24,7 @@ from poc.models import Case, ChatMessage, ChatThread, Litigant, UploadedFile
 
 __all__ = [
     "ListCreateCaseAPI",
-    "RetrieveCaseAPI",
+    "RetrieveUpdateCaseAPI",
     "ListCreateUploadedFileAPI",
     "RetrieveUpdateDestroyUploadedFileAPI",
     "ListCreateThreadAPI",
@@ -53,10 +54,11 @@ class ListCreateCaseAPI(ListCreateAPIView):
         return queryset
 
 
-class RetrieveCaseAPI(RetrieveAPIView):
+class RetrieveUpdateCaseAPI(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     lookup_field = "uuid"
     lookup_url_kwarg = "case_uuid"
+    http_method_names = ["get", "patch", "options"]
 
     def get_queryset(self):
         if self.request.query_params.get("compact") == "true":

@@ -16,6 +16,6 @@ def test_happy_path(api_client, cases, users):
     api_client.force_authenticate(user=users["user1"])
     response = api_client.get(_get_api_url(cases["mahadevan_vs_gopalan"].uuid))
     assert response.status_code == 200
-    assert response.data["id"] == cases["mahadevan_vs_gopalan"].id
+    assert response.data["uuid"] == str(cases["mahadevan_vs_gopalan"].uuid)
     assert response.data["title"] == cases["mahadevan_vs_gopalan"].title
     assert "litigants" not in response.data

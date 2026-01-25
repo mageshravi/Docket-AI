@@ -12,7 +12,7 @@ Markup:
 :hover - Hover state
 :focus - Focus state
 
-Styleguide: Forms.EntityTags
+Styleguide: Forms.EntityTags.Default
 */
 .m-entity-tag {
     position: relative;
@@ -20,7 +20,7 @@ Styleguide: Forms.EntityTags
     flex-flow: row;
     column-gap: 8px;
     align-items: center;
-    padding: 5px 12px 5px 16px;
+    padding: 5px 16px;
     background-color: transparent;
     border: var(--ip-border-width) solid var(--ip-border-color);
     border-radius: 17px;
@@ -30,6 +30,10 @@ Styleguide: Forms.EntityTags
     &:hover {
         border-color: var(--panel-bg);
         background-color: var(--panel-bg);
+    }
+
+    &:has(&__icon-x) {
+        padding-inline-end: 12px;
     }
 
     &:has(&__icon-x:active) {
@@ -63,3 +67,19 @@ Styleguide: Forms.EntityTags
         }
     }
 }
+
+/*
+Entity Tag (Locked)
+
+Locked Entity tags are used within entity selectors.
+
+Markup:
+<span class="m-entity-tag {{ modifier_class }}">
+    Tag Name
+</span>
+
+:hover - Hover state
+:focus - Focus state
+
+Styleguide: Forms.EntityTags.Locked
+*/

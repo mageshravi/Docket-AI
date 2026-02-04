@@ -39,6 +39,9 @@ event_date | DATETIME | NOT NULL | Date and time of the occurrence.
 place | VARCHAR | _NULL_ | _N/A_
 custom_title | VARCHAR | _NULL_ | Custom title assigned by user
 custom_description | TEXT | _NULL_ | Custom description assigned by user
+data | JSON | NOT NULL | The original JSON returned by the LLM
+source_entity | ENUM | NOT NULL | UPLOADED_FILE, PARSED_EMAIL or PARSED_EMAIL_ATTACHMENT
+source_entity_id | INTEGER | Positive, NOT NULL | ID of the source entity
 
 ## Implementation
 
@@ -59,8 +62,24 @@ The shared task calls one of the three management commands to perform the extrac
 
 ### Management Commands
 
-Implement three management commands,
+Implement a management command `extract_events_from_uploaded_file`.
 
-1. `extract_events_from_uploaded_file`
-1. `extract_events_from_parsed_email`
-1. `extract_events_from_parsed_email_attachment`
+If the file is a regular file (doc, spreadsheet, presentation, pdf, text or csv), then read the contents and pass-on to LLM for event extraction. The LLM must return event data in the following JSON format,
+
+```json
+{
+  "title": "Suitable title not exceeding 255 characters",
+  "description": "Parsed description in TEXT format",
+  "event_date": "<datetime> of the occurrence",
+  "place": "",
+  "trigger": "<trigger>",
+  "participants": [
+    "Participant 1",
+    "Participant 2",
+  ],
+  "attributes": "<attributes>",
+  "confidence_score": "Confidence score assigned by LLM (from 0.0 to 1.0)"
+}
+```
+
+If the file is an email, then read the contents and pass-on to LLM for event extraction. Additionally, if the email has attachments, then iterate through the attachments and extract events.

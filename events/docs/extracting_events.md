@@ -82,4 +82,36 @@ If the file is a regular file (doc, spreadsheet, presentation, pdf, text or csv)
 }
 ```
 
-If the file is an email, then read the contents and pass-on to LLM for event extraction. Additionally, if the email has attachments, then iterate through the attachments and extract events.
+#### Handling Documents
+
+If the uploaded file is a document, then read its contents and pass them on to the LLM for event extraction.
+
+Let the LLM extract/infer the document's _**published date**_. If not found, use the file’s uploaded date as the published date. Any event with a relative temporal anchor, such as tomorrow, a week later, etc., is computed relative to the published date.
+
+Use this published date as a reference to compute events that may have relative dates, e.g., tomorrow, a week later, and so on.
+
+In addition to the events extracted, let the LLM explicitly include one event, preferably as the first event, following the guidelines below,
+
+1. `title` - Extracted/Inferred document title where available. Otherwise, generate suitably.
+1. `description` - Summary of the document.
+1. `event_date` - Extracted/Inferred _**published date**_. If not found, use the file's uploaded date.
+1. `trigger` - Published.
+
+#### Handling Emails
+
+If the file is an email, then read its contents and pass them on to LLM for event extraction.
+
+Any event with a relative temporal anchor, such as yesterday, tomorrow, etc., is computed relative to the email's "sent" date.
+
+In addition to the events extracted, let the LLM explicitly include one event, preferably as the first event, following the guidelines below,
+
+1. `title` - "Email Sent: &lt;Subject&gt;" or "Email Received: &lt;Subject&gt;" from the point of view of our client.
+1. `description` - Summary of the email.
+1. `event_date` - Date the email was sent/received.
+1. `trigger` - Email.
+
+#### Handling Email Attachments
+
+If the file is an email attachment, then read its contents and pass them on to LLM for event extraction.
+
+Any event with the relative temporal anchor, such as yesterday, tomorrow, etc., is computed relative to the original email's "sent" date.

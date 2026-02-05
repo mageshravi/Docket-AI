@@ -10,6 +10,7 @@ An event is a specific occurrence anchored in time. It must involve:
 ### Communications as Events
 
 All communications and interactions should be treated as events, including:
+
 - **Phone calls** (e.g., "called John at 3 PM", "received a call from client")
 - **Emails** (e.g., "sent proposal via email", "received response from supplier")
 - **Text messages** (e.g., "texted the team", "received SMS confirmation")
@@ -17,6 +18,7 @@ All communications and interactions should be treated as events, including:
 - **Any form of correspondence** between parties
 
 Important: If you can't ask "When did this happen?", it's likely NOT an event but rather an entity attribute or fact. For example:
+
 - "The company is based in London" → NOT an event (it's a fact/attribute)
 - "The company opened its London office on March 15, 2025" → IS an event
 - "John's email is john@example.com" → NOT an event (it's contact information)
@@ -55,7 +57,7 @@ Important: If you can't ask "When did this happen?", it's likely NOT an event bu
 
 1. Use the email's **sent date** as the reference for computing any events with relative temporal anchors (e.g., "yesterday", "tomorrow", "tomorrow morning").
 2. **Important**: Always include one event as the **first event** representing the email itself:
-   - **title**: Format as either "Email Sent: <Subject>" or "Email Received: <Subject>" from the perspective of the recipient/stakeholder.
+   - **title**: Format as either "Email Sent: &lt;Subject&gt;" or "Email Received: &lt;Subject&gt;" from the perspective of the recipient/stakeholder.
    - **description**: A summary of the email's main content, purpose, and key details.
    - **event_date**: The date and time the email was sent or received.
    - **trigger**: "Email"
@@ -87,7 +89,3 @@ Return a JSON array of events. Each event should follow this structure:
 ```
 
 If no events are found in the document, return an empty array: []
-
-## Document Content
-
-{DOCUMENT_CONTENT}

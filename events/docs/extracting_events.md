@@ -115,3 +115,49 @@ In addition to the events extracted, let the LLM explicitly include one event, p
 If the file is an email attachment, then read its contents and pass them on to LLM for event extraction.
 
 Any event with the relative temporal anchor, such as yesterday, tomorrow, etc., is computed relative to the original email's "sent" date.
+
+### Providing Context
+
+Use the following format to provide the context (within prompts).
+
+For documents,
+
+```text
+[Document]
+Filename: <filename>
+Uploaded on: <datetime>
+Published on: <datetime> (optional)
+Content:
+<content>
+--- END ---
+```
+
+For emails,
+
+```text
+[Email]
+Subject: <subject>
+From: <sender>
+Recipients: <recipient_1>, <recipient_n>
+Sent on: <datetime>
+Attachments: <filename_1>, <filename_n>
+Content:
+<content>
+--- END ---
+```
+
+For email attachments,
+
+```text
+[Email Attachment]
+Email:
+  Subject: <subject>
+  From: <sender>
+  Recipients: <recipient_1>, <recipient_n>
+  Attachments: <filename_1>, <filename_n>
+  Sent on: <datetime>
+Filename: <filename>
+Content:
+<content>
+--- END --
+```

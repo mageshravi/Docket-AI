@@ -3,8 +3,8 @@ import logging
 
 from django.conf import settings
 from django.db.models import QuerySet
-from django.utils.timezone import datetime
-from openai import OpenAI
+from django.utils import timezone
+from openai import OpenAI, OpenAIError
 
 from poc.models import ParsedEmailAttachment
 from poc.utils import (
@@ -61,13 +61,13 @@ class EventExtractorService:
         _events = self._parse_events_from_content(content)
         for _event in _events:
             # default to now if event_date is missing or invalid
-            event_date = datetime.now()
+            event_date = timezone.datetime.now()
             if event_date_str := _event.get("event_date"):
                 try:
-                    event_date = datetime.fromisoformat(event_date_str)
+                    event_date = timezone.datetime.fromisoformat(event_date_str)
                     if event_date.tzinfo is None:
                         # convert to local timezone
-                        event_date = event_date.astimezone()
+                        event_date = timezone.make_aware(event_date)
                 except ValueError as error:
                     logger.info(
                         f"Failed to parse event_date '{event_date_str}' for event '{_event.get('title')}'. Error: {error}. Defaulting to current datetime."
@@ -175,15 +175,28 @@ class EventExtractorService:
         Returns:
             list[dict]: List of extracted events
         """
-        response = self.openai_client.responses.create(
-            model="gpt-4o",
-            input=[
-                {"role": "system", "content": self.prompt_instructions},
-                {"role": "user", "content": content},
-            ],
-        )
+        try:
+            response = self.openai_client.responses.create(
+                model="gpt-4o",
+                input=[
+                    {"role": "system", "content": self.prompt_instructions},
+                    {"role": "user", "content": content},
+                ],
+            )
 
-        if response.output_text:
-            return json.loads(response.output_text)
+            if response.output_text:
+                return json.loads(response.output_text)
 
-        return []
+            return []
+        except OpenAIError as e:
+            logger.error(f"OpenAI API error: {e}")
+            raise RuntimeError(
+                "Failed to parse events from content due to an OpenAI API error."
+            )
+        except json.JSONDecodeError as e:
+            logger.error(
+                f"JSON decoding error: {e}. Response text: {response.output_text}"
+            )
+            raise ValueError(
+                "Failed to parse events from content due to invalid JSON format in the LLM response."
+            )

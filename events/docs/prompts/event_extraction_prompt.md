@@ -67,7 +67,6 @@ Important: If you can't ask "When did this happen?", it's likely NOT an event bu
 ### For Email Attachments
 
 1. Use the **original email's sent date** as the reference for computing any events with relative temporal anchors.
-2. Follow the same extraction guidelines as for documents and emails.
 
 ## Output Format
 
@@ -90,4 +89,4 @@ Return a JSON response with array of NEW events only. Do not include any events 
 
 Return only the JSON object (without the markdown codeblock).
 
-If no events are found in the document, return an empty array: []
+Return events within an array. If no events are found in the document, return an empty array: []

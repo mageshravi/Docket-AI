@@ -70,23 +70,23 @@ Important: If you can't ask "When did this happen?", it's likely NOT an event bu
 
 ## Output Format
 
-Return a JSON array of events. Each event should follow this structure:
+Return a JSON response with array of events. Each event should follow this structure:
 
 ```json
-[
-  {
-    "title": "Event title not exceeding 255 characters",
-    "description": "Brief sentence with trigger, participants, temporal & spatial anchors, and attributes",
-    "event_date": "2026-02-15T14:30:00",
-    "place": "Conference Room B",
-    "trigger": "scheduled",
-    "participants": [
-      "Alice Johnson",
-      "Acme Corp"
-    ],
-    "attributes": "Confirmed"
-  }
-]
+{
+  "title": "Event title not exceeding 255 characters",
+  "description": "Brief sentence with trigger, participants, temporal & spatial anchors, and attributes",
+  "event_date": "2026-02-15T14:30:00",
+  "place": "Conference Room B",
+  "trigger": "scheduled",
+  "participants": [
+    "Alice Johnson",
+    "Acme Corp"
+  ],
+  "attributes": "Confirmed"
+}
 ```
+
+Return only the JSON object (without the markdown codeblock).
 
 If no events are found in the document, return an empty array: []

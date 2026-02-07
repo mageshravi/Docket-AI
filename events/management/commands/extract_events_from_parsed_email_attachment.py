@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 
-from events.services import EventExtractorService
+from events.services import EmailAttachmentEventExtractor
 from poc.models import ParsedEmailAttachment
 
 
@@ -42,11 +42,9 @@ class Command(BaseCommand):
             f"Extracting events from parsed email attachment ID {attachment_id}."
         )
 
-        service = EventExtractorService()
+        service = EmailAttachmentEventExtractor()
         try:
-            events = service.extract_from_parsed_email_attachment(
-                attachment_id=attachment.id
-            )
+            events = service.extract_events(source_entity_id=attachment.id)
         except (ValueError, RuntimeError) as err:
             attachment.mark_event_extraction_failed(error_message=str(err))
             raise CommandError(str(err))

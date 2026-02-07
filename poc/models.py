@@ -191,6 +191,12 @@ class ParsedEmailAttachment(TimestampedModel):
         COMPLETED = "completed", "Completed"
         FAILED = "failed", "Failed"
 
+    class EventExtractionStatus(models.TextChoices):
+        PENDING = "pending", "Pending"
+        IN_PROGRESS = "in_progress", "In Progress"
+        EXTRACTED = "extracted", "Extracted"
+        FAILED = "failed", "Failed"
+
     parsed_email = models.ForeignKey(
         ParsedEmail, on_delete=models.CASCADE, related_name="parsed_attachments"
     )
@@ -203,6 +209,12 @@ class ParsedEmailAttachment(TimestampedModel):
         max_length=20, choices=EmbeddingStatus.choices, default=EmbeddingStatus.PENDING
     )
     embedding_error_message = models.TextField(blank=True)
+    event_extraction_status = models.CharField(
+        max_length=20,
+        choices=EventExtractionStatus.choices,
+        default=EventExtractionStatus.PENDING,
+    )
+    event_extraction_error_message = models.TextField(blank=True)
 
     class Meta:
         db_table = "poc_parsed_email_attachments"
@@ -233,6 +245,35 @@ class ParsedEmailAttachment(TimestampedModel):
             self.embedding_error_message = error_message
 
         self.save(update_fields=["embedding_status", "embedding_error_message"])
+
+    def mark_event_extraction_in_progress(self):
+        if self.event_extraction_status == self.EventExtractionStatus.IN_PROGRESS:
+            return
+
+        self.event_extraction_status = self.EventExtractionStatus.IN_PROGRESS
+        self.save(update_fields=["event_extraction_status"])
+
+    def mark_event_extraction_completed(self):
+        if self.event_extraction_status == self.EventExtractionStatus.EXTRACTED:
+            return
+
+        self.event_extraction_status = self.EventExtractionStatus.EXTRACTED
+        self.save(update_fields=["event_extraction_status"])
+
+    def mark_event_extraction_failed(self, error_message=None):
+        if (
+            self.event_extraction_status == self.EventExtractionStatus.FAILED
+            and not error_message
+        ):
+            return
+
+        self.event_extraction_status = self.EventExtractionStatus.FAILED
+        if error_message:
+            self.event_extraction_error_message = error_message
+
+        self.save(
+            update_fields=["event_extraction_status", "event_extraction_error_message"]
+        )
 
 
 class ParsedEmailEmbedding(TimestampedModel):

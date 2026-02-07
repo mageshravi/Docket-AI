@@ -62,7 +62,11 @@ The shared task calls one of the three management commands to perform the extrac
 
 ### Management Commands
 
-Implement a management command `extract_events_from_uploaded_file`.
+Implement three management commands,
+
+1. `extract_events_from_uploaded_file`
+1. `extract_events_from_parsed_email`
+1. `extract_events_from_parsed_email_attachment`
 
 If the file is a regular file (doc, spreadsheet, presentation, pdf, text or csv), then read the contents and pass-on to LLM for event extraction. The LLM must return event data in the following JSON format,
 
@@ -81,6 +85,8 @@ If the file is a regular file (doc, spreadsheet, presentation, pdf, text or csv)
   "confidence_score": "Confidence score assigned by LLM (from 0.0 to 1.0)"
 }
 ```
+
+Do not including existing events in the response. Only include new events that have been identified.
 
 #### Handling Documents
 
@@ -129,6 +135,8 @@ Uploaded on: <datetime>
 Published on: <datetime> (optional)
 Content:
 <content>
+Existing Extracted Events:
+<events_json>
 --- END ---
 ```
 
@@ -143,6 +151,8 @@ Sent on: <datetime>
 Attachments: <filename_1>, <filename_n>
 Content:
 <content>
+Existing Extracted Events:
+<events_json>
 --- END ---
 ```
 
@@ -159,5 +169,7 @@ Email:
 Filename: <filename>
 Content:
 <content>
+Existing Extracted Events:
+<events_json>
 --- END --
 ```

@@ -32,8 +32,9 @@ Important: If you can't ask "When did this happen?", it's likely NOT an event bu
 ## Instructions
 
 1. Carefully read through the entire document
-2. Identify all events that meet the criteria above
-3. For each event, extract the following information:
+2. Review the list of existing events (if provided) to avoid duplication
+3. Identify all NEW events that meet the criteria above and are not already in the existing events list
+4. For each NEW event, extract the following information:
    - **title**: A concise title (max 255 characters).
    - **description**: A brief sentence containing details about the trigger, participants, temporal & spatial anchors, and attributes
    - **event_date**: The date and time of the occurrence in ISO 8601 format (YYYY-MM-DDTHH:MM:SS). If only a date is mentioned, use 00:00:00 for the time. If the date is relative (e.g., "next Tuesday", "last week"), calculate the actual date based on the reference date (see below) and mention it as inferred.
@@ -70,7 +71,7 @@ Important: If you can't ask "When did this happen?", it's likely NOT an event bu
 
 ## Output Format
 
-Return a JSON response with array of events. Each event should follow this structure:
+Return a JSON response with array of NEW events only. Do not include any events that already exist in the provided "Existing Events" list. Each event should follow this structure:
 
 ```json
 {

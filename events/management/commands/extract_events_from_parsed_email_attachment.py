@@ -25,6 +25,19 @@ class Command(BaseCommand):
                 f"ParsedEmailAttachment with ID {attachment_id} does not exist."
             )
 
+        if (
+            attachment.event_extraction_status
+            == ParsedEmailAttachment.EventExtractionStatus.IN_PROGRESS
+        ):
+            self.stdout.write(
+                self.style.WARNING(
+                    f"Event extraction is already in progress for attachment ID {attachment_id}."
+                )
+            )
+            return
+
+        attachment.mark_event_extraction_in_progress()
+
         self.stdout.write(
             f"Extracting events from parsed email attachment ID {attachment_id}."
         )
@@ -35,9 +48,11 @@ class Command(BaseCommand):
                 attachment_id=attachment.id
             )
         except (ValueError, RuntimeError) as err:
+            attachment.mark_event_extraction_failed(error_message=str(err))
             raise CommandError(str(err))
 
         if not events:
+            attachment.mark_event_extraction_completed()
             self.stdout.write(
                 self.style.WARNING(
                     f"No NEW events were extracted from attachment ID {attachment_id}."
@@ -59,6 +74,8 @@ class Command(BaseCommand):
                     )
                 )
                 self.stdout.write(f"Event data: {event.data}")
+
+        attachment.mark_event_extraction_completed()
 
         if len(events) == success_count:
             self.stdout.write(

@@ -132,7 +132,14 @@ class BaseEventExtractor(ABC):
             )
 
             if response.output_text:
-                return json.loads(response.output_text)
+                result = json.loads(response.output_text)
+                if isinstance(result, list):
+                    return result
+                elif isinstance(result, dict) and "title" in result:
+                    logger.warning(
+                        f"Received a single event as a dictionary instead of a list. Wrapping it in a list. Response text: {response.output_text}"
+                    )
+                    return [result]
 
             return []
         except OpenAIError as e:
@@ -166,6 +173,10 @@ class BaseEventExtractor(ABC):
         """
         result = []
         for event_data in events:
+            if not isinstance(event_data, dict):
+                print(f"Skipping invalid event data (not a dictionary): {event_data}")
+                continue
+
             # default to now if event_date is missing or invalid
             event_date = timezone.datetime.now()
             if event_date_str := event_data.get("event_date"):
@@ -283,7 +294,6 @@ class EmailAttachmentEventExtractor(BaseEventExtractor):
         )
 
 
-# todo: test this implementation.
 class EmailEventExtractor(BaseEventExtractor):
     """Service for extracting events from a given input."""
 
@@ -366,26 +376,26 @@ class UploadedFileEventExtractor(BaseEventExtractor):
 
         extraction_function = None
 
-        if uploaded_file.content_type == "text/plain":
+        if uploaded_file.file_extension == "txt":
             extraction_function = extract_text_from_txt
-        elif uploaded_file.content_type == "text/csv":
+        elif uploaded_file.file_extension == "csv":
             extraction_function = extract_text_from_csv
-        elif uploaded_file.content_type in [
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "application/vnd.ms-excel",
+        elif uploaded_file.file_extension in [
+            "xlsx",
+            "xls",
         ]:
             extraction_function = extract_text_from_xlsx
-        elif uploaded_file.content_type in [
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "application/msword",
+        elif uploaded_file.file_extension in [
+            "docx",
+            "doc",
         ]:
             extraction_function = extract_text_from_docx
-        elif uploaded_file.content_type in [
-            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            "application/vnd.ms-powerpoint",
+        elif uploaded_file.file_extension in [
+            "pptx",
+            "ppt",
         ]:
             extraction_function = extract_text_from_pptx
-        elif uploaded_file.content_type == "application/pdf":
+        elif uploaded_file.file_extension == "pdf":
             extraction_function = extract_text_from_pdf
         else:
             logger.warning(

@@ -398,7 +398,7 @@ class UploadedFileEventExtractor(BaseEventExtractor):
             extraction_function = extract_text_from_pdf
         else:
             logger.warning(
-                f"Unsupported content type '{uploaded_file.content_type}' for uploaded file ID {uploaded_file.id}. Skipping content extraction."
+                f"Unsupported file type '{uploaded_file.file_extension}' for uploaded file ID {uploaded_file.id}. Skipping content extraction."
             )
 
         if extraction_function:

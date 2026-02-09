@@ -87,6 +87,4 @@ Return a JSON response with array of NEW events only. Do not include any events 
 }
 ```
 
-Return only the JSON object (without the markdown codeblock).
-
-Return events within an array. If no events are found in the document, return an empty array: []
+Return only the JSON array (without the markdown codeblock). If no events are found in the document, return an empty array: []

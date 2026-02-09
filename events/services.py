@@ -281,3 +281,132 @@ class EmailAttachmentEventExtractor(BaseEventExtractor):
             source_entity=Event.SourceEntity.PARSED_EMAIL_ATTACHMENT,
             source_entity_id=attachment.id,
         )
+
+
+# todo: test this implementation.
+class EmailEventExtractor(BaseEventExtractor):
+    """Service for extracting events from a given input."""
+
+    def get_source_entity_type(self) -> Event.SourceEntity:
+        return Event.SourceEntity.PARSED_EMAIL
+
+    def get_source_entity(self, source_entity_id: int) -> ParsedEmail:
+        try:
+            return ParsedEmail.objects.get(id=source_entity_id)
+        except ParsedEmail.DoesNotExist:
+            raise ValueError(f"ParsedEmail with ID {source_entity_id} does not exist.")
+
+    def get_content(self, source_entity: ParsedEmail) -> str:
+        if not isinstance(source_entity, ParsedEmail):
+            raise ValueError(
+                f"Invalid source entity type: expected ParsedEmail, got {type(source_entity)}"
+            )
+
+        email = source_entity
+
+        attachment_names = ", ".join(
+            attachment.filename for attachment in email.parsed_attachments.all()
+        )
+        content = (
+            "[Email]\n"
+            f"Subject: {email.subject}\n"
+            f"From: {email.sender}\n"
+            f"To: {email.to_recipients}\n"
+            f"Cc: {email.cc_recipients}\n"
+            f"Attachments: {attachment_names}\n"
+            f"Sent On: {email.sent_on}\n"
+            "Content:\n"
+            f"{email.cleaned_body}\n"
+        )
+
+        return content
+
+    def get_existing_events(self, source_entity) -> QuerySet[Event]:
+        if not isinstance(source_entity, ParsedEmail):
+            raise ValueError(
+                f"Invalid source entity type: expected ParsedEmail, got {type(source_entity)}"
+            )
+
+        email = source_entity
+
+        return Event.objects.filter(
+            source_entity=Event.SourceEntity.PARSED_EMAIL,
+            source_entity_id=email.id,
+        )
+
+
+# todo: test this implementation
+class UploadedFileEventExtractor(BaseEventExtractor):
+    """Service for extracting events from a given input."""
+
+    def get_source_entity_type(self) -> Event.SourceEntity:
+        return Event.SourceEntity.UPLOADED_FILE
+
+    def get_source_entity(self, source_entity_id: int) -> UploadedFile:
+        try:
+            return UploadedFile.objects.get(id=source_entity_id)
+        except UploadedFile.DoesNotExist:
+            raise ValueError(f"UploadedFile with ID {source_entity_id} does not exist.")
+
+    def get_content(self, source_entity: UploadedFile) -> str:
+        if not isinstance(source_entity, UploadedFile):
+            raise ValueError(
+                f"Invalid source entity type: expected UploadedFile, got {type(source_entity)}"
+            )
+
+        uploaded_file = source_entity
+
+        content = (
+            "[Document]\n"
+            f"Filename: {uploaded_file.filename}\n"
+            f"Uploaded On: {uploaded_file.created_at}\n"
+            # todo: include published date if available (may require additional field in UploadedFile model and handling during file upload)
+            "Content:\n"
+        )
+
+        extraction_function = None
+
+        if uploaded_file.content_type == "text/plain":
+            extraction_function = extract_text_from_txt
+        elif uploaded_file.content_type == "text/csv":
+            extraction_function = extract_text_from_csv
+        elif uploaded_file.content_type in [
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.ms-excel",
+        ]:
+            extraction_function = extract_text_from_xlsx
+        elif uploaded_file.content_type in [
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/msword",
+        ]:
+            extraction_function = extract_text_from_docx
+        elif uploaded_file.content_type in [
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "application/vnd.ms-powerpoint",
+        ]:
+            extraction_function = extract_text_from_pptx
+        elif uploaded_file.content_type == "application/pdf":
+            extraction_function = extract_text_from_pdf
+        else:
+            logger.warning(
+                f"Unsupported content type '{uploaded_file.content_type}' for uploaded file ID {uploaded_file.id}. Skipping content extraction."
+            )
+
+        if extraction_function:
+            for chunk in extraction_function(uploaded_file.file):
+                content += chunk
+
+        return content
+
+    def get_existing_events(self, source_entity) -> QuerySet[Event]:
+        if not isinstance(source_entity, UploadedFile):
+            raise ValueError(
+                f"Invalid source entity type: expected UploadedFile, got {type(source_entity)}"
+            )
+
+        uploaded_file = source_entity
+
+        return Event.objects.filter(
+            source_entity=Event.SourceEntity.UPLOADED_FILE,
+            source_entity_id=uploaded_file.id,
+        )

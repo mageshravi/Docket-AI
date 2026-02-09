@@ -345,7 +345,6 @@ class EmailEventExtractor(BaseEventExtractor):
         )
 
 
-# todo: test this implementation
 class UploadedFileEventExtractor(BaseEventExtractor):
     """Service for extracting events from a given input."""
 

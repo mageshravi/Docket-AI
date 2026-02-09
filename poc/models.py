@@ -85,6 +85,11 @@ class UploadedFile(TimestampedModel):
     def __str__(self):
         return self.file.name
 
+    @property
+    def file_extension(self):
+        """Returns the file extension of the uploaded file."""
+        return self.file.name.split(".")[-1].lower() if "." in self.file.name else ""
+
     def mark_as_processing(self):
         if self.status == self.Status.PROCESSING:
             return

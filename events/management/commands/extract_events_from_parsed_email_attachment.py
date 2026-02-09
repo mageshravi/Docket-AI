@@ -84,6 +84,6 @@ class Command(BaseCommand):
         else:
             self.stdout.write(
                 self.style.WARNING(
-                    f"Extracted {len(events)} events, but only {success_count} were saved successfully due to validation errors."
+                    f"{success_count} out of {len(events)} events extracted were saved successfully."
                 )
             )

@@ -42,6 +42,8 @@ Important: If you can't ask "When did this happen?", it's likely NOT an event bu
    - **trigger**: The specific word or phrase expressing the event occurrence
    - **participants**: List of entities involved (people, organizations, products)
    - **attributes**: Status or modifiers like "Confirmed", "Canceled", "Tentative", "Completed"
+5. **Date Ranges**: If a range of dates is found (e.g., "from date A till date B", "between date A and date B"), identify them as **two separate events** - one with the starting date and another with the ending date.
+6. **Multiple Dates**: If multiple dates are listed (e.g., "date A, date C, and date F"), identify **each date separately** as an individual event.
 
 ## Special Instructions by Content Type
 

@@ -98,14 +98,14 @@ class Command(BaseCommand):
         Returns:
             bool: True if PENDING, False otherwise.
         """
-        if uploaded_file.status == UploadedFile.Status.PROCESSING:
+        if uploaded_file.embedding_status == UploadedFile.EmbeddingStatus.PROCESSING:
             raise RuntimeError(
                 f"File with ID {uploaded_file.id} is already being processed."
             )
 
-        if uploaded_file.status in [
-            UploadedFile.Status.COMPLETED,
-            UploadedFile.Status.FAILED,
+        if uploaded_file.embedding_status in [
+            UploadedFile.EmbeddingStatus.COMPLETED,
+            UploadedFile.EmbeddingStatus.FAILED,
         ]:
             if not force:
                 raise RuntimeError(

@@ -5,9 +5,16 @@ from .models import Case, CaseLitigant, ChatThread, Litigant, LitigantRole, Uplo
 
 @admin.register(UploadedFile)
 class UploadedFileAdmin(admin.ModelAdmin):
-    list_display = ("id", "filename", "file_name", "is_active", "status", "created_at")
+    list_display = (
+        "id",
+        "filename",
+        "file_name",
+        "is_active",
+        "embedding_status",
+        "created_at",
+    )
     list_display_links = ("file_name",)
-    list_filter = ("status", "is_deleted")
+    list_filter = ("embedding_status", "is_deleted")
     search_fields = ("file_name",)
     ordering = ("-id",)
 

@@ -41,7 +41,10 @@ class Command(BaseCommand):
             )
             return
 
-        if uploaded_file.status != UploadedFile.Status.PENDING and not kwargs["force"]:
+        if (
+            uploaded_file.embedding_status != UploadedFile.EmbeddingStatus.PENDING
+            and not kwargs["force"]
+        ):
             self.stderr.write(
                 self.style.ERROR(
                     f"File with ID {file_id} is not in PENDING status. Use --force to process it anyway."

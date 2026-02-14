@@ -19,7 +19,9 @@ class Command(BaseCommand):
         email_id = options["email_id"]
 
         try:
-            email = ParsedEmail.objects.get(id=email_id)
+            email = ParsedEmail.objects.select_related("uploaded_file__case").get(
+                id=email_id
+            )
         except ParsedEmail.DoesNotExist:
             raise CommandError(f"ParsedEmail with ID {email_id} does not exist.")
 
@@ -57,6 +59,7 @@ class Command(BaseCommand):
         success_count = 0
         for event in events:
             try:
+                event.case = email.uploaded_file.case
                 event.full_clean()
                 event.save()
                 self.stdout.write(f"New event saved: {event}")

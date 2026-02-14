@@ -61,6 +61,7 @@ class Command(BaseCommand):
         success_count = 0
         for event in events:
             try:
+                event.case = uploaded_file.case
                 event.full_clean()
                 event.save()
                 self.stdout.write(f"New event saved: {event}")

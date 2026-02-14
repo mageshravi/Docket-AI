@@ -2,6 +2,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 from core.models import TimestampedModel
+from poc.models import Case
 
 
 class Event(TimestampedModel):
@@ -50,6 +51,9 @@ class Event(TimestampedModel):
     )
     source_entity_id = models.PositiveIntegerField(
         validators=[MinValueValidator(1)], help_text="ID of the source entity"
+    )
+    case = models.ForeignKey(
+        Case, blank=False, null=True, on_delete=models.CASCADE, related_name="events"
     )
 
     class Meta:

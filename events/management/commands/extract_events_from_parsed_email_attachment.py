@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
+from openai import OpenAIError
 
 from events.services import EmailAttachmentEventExtractor
 from poc.models import ParsedEmailAttachment
@@ -19,7 +20,9 @@ class Command(BaseCommand):
         attachment_id = options["attachment_id"]
 
         try:
-            attachment = ParsedEmailAttachment.objects.get(id=attachment_id)
+            attachment = ParsedEmailAttachment.objects.select_related(
+                "parsed_email__uploaded_file__case"
+            ).get(id=attachment_id)
         except ParsedEmailAttachment.DoesNotExist:
             raise CommandError(
                 f"ParsedEmailAttachment with ID {attachment_id} does not exist."
@@ -45,7 +48,7 @@ class Command(BaseCommand):
         service = EmailAttachmentEventExtractor()
         try:
             events = service.extract_events(source_entity_id=attachment.id)
-        except (ValueError, RuntimeError) as err:
+        except (ValueError, OpenAIError) as err:
             attachment.mark_event_extraction_failed(error_message=str(err))
             raise CommandError(str(err))
 
@@ -61,6 +64,7 @@ class Command(BaseCommand):
         success_count = 0
         for event in events:
             try:
+                event.case = attachment.parsed_email.uploaded_file.case
                 event.full_clean()  # Validate the event data before saving
                 event.save()
                 self.stdout.write(f"New event saved: {event}")

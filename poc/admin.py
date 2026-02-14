@@ -1,31 +1,15 @@
 from django.contrib import admin
 
-from .models import Case, CaseLitigant, ChatThread, Litigant, LitigantRole, UploadedFile
-
-
-@admin.register(UploadedFile)
-class UploadedFileAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "filename",
-        "file_name",
-        "is_active",
-        "embedding_status",
-        "created_at",
-    )
-    list_display_links = ("file_name",)
-    list_filter = ("embedding_status", "is_deleted")
-    search_fields = ("file_name",)
-    ordering = ("-id",)
-
-    def file_name(self, obj):
-        return obj.file.name.split("/")[-1]
-
-    def is_active(self, obj):
-        return not obj.is_deleted
-
-    file_name.short_description = "File Name"
-    is_active.boolean = True
+from .models import (
+    Case,
+    CaseLitigant,
+    ChatThread,
+    Litigant,
+    LitigantRole,
+    ParsedEmail,
+    ParsedEmailAttachment,
+    UploadedFile,
+)
 
 
 class CaseLitigantInline(admin.StackedInline):
@@ -67,4 +51,60 @@ class LitigantRoleAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "handle", "created_at")
     list_display_links = ("handle",)
     search_fields = ("name", "handle")
+    ordering = ("-id",)
+
+
+@admin.register(UploadedFile)
+class UploadedFileAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "filename",
+        "file_name",
+        "is_active",
+        "embedding_status",
+        "event_extraction_status",
+        "created_at",
+    )
+    list_display_links = ("file_name",)
+    list_filter = ("embedding_status", "event_extraction_status", "is_deleted")
+    search_fields = ("file_name",)
+    ordering = ("-id",)
+
+    def file_name(self, obj):
+        return obj.file.name.split("/")[-1]
+
+    def is_active(self, obj):
+        return not obj.is_deleted
+
+    file_name.short_description = "File Name"
+    is_active.boolean = True
+
+
+@admin.register(ParsedEmail)
+class ParsedEmailAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "subject",
+        "sender",
+        "sent_on",
+        "embedding_status",
+        "event_extraction_status",
+        "created_at",
+    )
+    list_display_links = ("subject",)
+    list_filter = ("embedding_status", "event_extraction_status")
+    ordering = ("-id",)
+
+
+@admin.register(ParsedEmailAttachment)
+class ParsedEmailAttachmentAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "filename",
+        "embedding_status",
+        "event_extraction_status",
+        "created_at",
+    )
+    list_display_links = ("filename",)
+    list_filter = ("embedding_status", "event_extraction_status")
     ordering = ("-id",)

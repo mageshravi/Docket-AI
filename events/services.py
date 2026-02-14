@@ -7,7 +7,14 @@ from abc import ABC, abstractmethod
 from django.conf import settings
 from django.db.models import QuerySet
 from django.utils import timezone
-from openai import OpenAI, OpenAIError
+from openai import APIConnectionError, OpenAI, OpenAIError, RateLimitError
+from tenacity import (
+    before_sleep_log,
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from poc.models import ParsedEmail, ParsedEmailAttachment, UploadedFile
 from poc.utils import (
@@ -113,6 +120,16 @@ class BaseEventExtractor(ABC):
         """
         pass
 
+    @retry(
+        # Exponential backoff: 2s, 4s, 8s, 16s... up to a max of 60s
+        wait=wait_exponential(multiplier=1, min=2, max=60),
+        # Stop after 5 failed attempts
+        stop=stop_after_attempt(5),
+        # Only retry on specific network or rate-limit errors
+        retry=retry_if_exception_type((RateLimitError, APIConnectionError)),
+        # Log the attempt details before sleeping
+        before_sleep=before_sleep_log(logger, logging.WARNING),
+    )
     def deduce_events_from_content(self, content: str) -> list[dict]:
         """Parses the events from the given file content using LLM (OpenAI).
 
@@ -144,9 +161,7 @@ class BaseEventExtractor(ABC):
             return []
         except OpenAIError as e:
             logger.error(f"OpenAI API error: {e}")
-            raise RuntimeError(
-                "Failed to parse events from content due to an OpenAI API error."
-            )
+            raise
         except json.JSONDecodeError as e:
             logger.error(
                 f"JSON decoding error: {e}. Response text: {response.output_text}"

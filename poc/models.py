@@ -80,6 +80,11 @@ class UploadedFile(TimestampedModel, VectorEmbeddableModel, EventExtractableMode
         """Returns the file extension of the uploaded file."""
         return self.file.name.split(".")[-1].lower() if "." in self.file.name else ""
 
+    def mark_as_deleted(self):
+        """Marks the file as deleted without actually removing it from the database."""
+        self.is_deleted = True
+        self.save(update_fields=["is_deleted"])
+
 
 class ParsedEmail(TimestampedModel, VectorEmbeddableModel, EventExtractableModel):
     """

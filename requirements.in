@@ -25,3 +25,4 @@ djangorestframework~=3.16.1
 celery~=5.5
 redis~=6.4.0
 django-celery-results~=2.6.0
+tenacity==9.1.4

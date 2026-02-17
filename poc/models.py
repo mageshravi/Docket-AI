@@ -6,7 +6,7 @@ from django.db import models
 from django.utils.timezone import now
 from pgvector.django import HnswIndex, VectorField
 
-from core.models import TimestampedModel
+from core.models import EventExtractableModel, TimestampedModel, VectorEmbeddableModel
 
 from .managers import ActiveUploadedFilesManager
 from .validators import FileValidator, validate_phone_number
@@ -18,17 +18,11 @@ def get_file_upload_path(instance, filename):
     return f"poc/uploaded_files/case_{instance.case.id}/{today}_{filename}"
 
 
-class UploadedFile(TimestampedModel):
+class UploadedFile(TimestampedModel, VectorEmbeddableModel, EventExtractableModel):
     """
     Model to store uploaded files.
     This model is used to keep track of files uploaded for processing.
     """
-
-    class Status(models.TextChoices):
-        PENDING = "pending", "Pending"
-        PROCESSING = "processing", "Processing"
-        COMPLETED = "completed", "Completed"
-        FAILED = "failed", "Failed"
 
     allowed_file_types = [
         "application/pdf",
@@ -63,10 +57,6 @@ class UploadedFile(TimestampedModel):
         upload_to=get_file_upload_path,
         validators=[file_validator],
     )
-    status = models.CharField(
-        max_length=20, choices=Status.choices, default=Status.PENDING
-    )
-    error_message = models.TextField(blank=True)
     case = models.ForeignKey(
         "Case", on_delete=models.CASCADE, related_name="uploaded_files"
     )
@@ -85,52 +75,22 @@ class UploadedFile(TimestampedModel):
     def __str__(self):
         return self.file.name
 
-    def mark_as_processing(self):
-        if self.status == self.Status.PROCESSING:
-            return
-
-        self.status = self.Status.PROCESSING
-        self.save(update_fields=["status"])
-
-    def mark_as_completed(self):
-        if self.status == self.Status.COMPLETED:
-            return
-
-        self.status = self.Status.COMPLETED
-        self.save(update_fields=["status"])
-
-    def mark_as_failed(self, error_message=None):
-        if self.status == self.Status.FAILED:
-            return
-
-        self.status = self.Status.FAILED
-        if error_message:
-            self.error_message = error_message
-
-        self.save(update_fields=["status", "error_message"])
+    @property
+    def file_extension(self):
+        """Returns the file extension of the uploaded file."""
+        return self.file.name.split(".")[-1].lower() if "." in self.file.name else ""
 
     def mark_as_deleted(self):
-        if self.is_deleted:
-            return
-
-        # Delete the file from storage
-        self.file.delete(save=False)
-        # Update the flag
+        """Marks the file as deleted without actually removing it from the database."""
         self.is_deleted = True
-        self.save(update_fields=["is_deleted", "file"])
+        self.save(update_fields=["is_deleted"])
 
 
-class ParsedEmail(TimestampedModel):
+class ParsedEmail(TimestampedModel, VectorEmbeddableModel, EventExtractableModel):
     """
     Model to store parsed email data.
     This model is used to keep track of emails that have been parsed.
     """
-
-    class EmbeddingStatus(models.TextChoices):
-        PENDING = "pending", "Pending"
-        PROCESSING = "processing", "Processing"
-        COMPLETED = "completed", "Completed"
-        FAILED = "failed", "Failed"
 
     uploaded_file = models.OneToOneField(
         UploadedFile, on_delete=models.CASCADE, related_name="parsed_email"
@@ -143,10 +103,6 @@ class ParsedEmail(TimestampedModel):
     body = models.TextField()
     cleaned_body = models.TextField()
     ai_summary = models.TextField(blank=True)
-    embedding_status = models.CharField(
-        max_length=20, choices=EmbeddingStatus.choices, default=EmbeddingStatus.PENDING
-    )
-    embedding_error_message = models.TextField(blank=True)
 
     class Meta:
         db_table = "poc_parsed_emails"
@@ -154,42 +110,14 @@ class ParsedEmail(TimestampedModel):
     def __str__(self):
         return f"{self.subject} dated {self.sent_on}"
 
-    def mark_as_processing(self):
-        if self.embedding_status == self.EmbeddingStatus.PROCESSING:
-            return
 
-        self.embedding_status = self.EmbeddingStatus.PROCESSING
-        self.save(update_fields=["embedding_status"])
-
-    def mark_as_completed(self):
-        if self.embedding_status == self.EmbeddingStatus.COMPLETED:
-            return
-
-        self.embedding_status = self.EmbeddingStatus.COMPLETED
-        self.save(update_fields=["embedding_status"])
-
-    def mark_as_failed(self, error_message=None):
-        if self.embedding_status == self.EmbeddingStatus.FAILED and not error_message:
-            return
-
-        self.embedding_status = self.EmbeddingStatus.FAILED
-        if error_message:
-            self.embedding_error_message = error_message
-
-        self.save(update_fields=["embedding_status", "embedding_error_message"])
-
-
-class ParsedEmailAttachment(TimestampedModel):
+class ParsedEmailAttachment(
+    TimestampedModel, VectorEmbeddableModel, EventExtractableModel
+):
     """
     Model to store parsed email attachments.
     This model is used to keep track of attachments from parsed emails.
     """
-
-    class EmbeddingStatus(models.TextChoices):
-        PENDING = "pending", "Pending"
-        PROCESSING = "processing", "Processing"
-        COMPLETED = "completed", "Completed"
-        FAILED = "failed", "Failed"
 
     parsed_email = models.ForeignKey(
         ParsedEmail, on_delete=models.CASCADE, related_name="parsed_attachments"
@@ -199,40 +127,12 @@ class ParsedEmailAttachment(TimestampedModel):
     content_type = models.CharField(max_length=255)
     size = models.PositiveIntegerField()  # Size in bytes
     ai_summary = models.TextField(blank=True)
-    embedding_status = models.CharField(
-        max_length=20, choices=EmbeddingStatus.choices, default=EmbeddingStatus.PENDING
-    )
-    embedding_error_message = models.TextField(blank=True)
 
     class Meta:
         db_table = "poc_parsed_email_attachments"
 
     def __str__(self):
         return self.filename
-
-    def mark_as_processing(self):
-        if self.embedding_status == self.EmbeddingStatus.PROCESSING:
-            return
-
-        self.embedding_status = self.EmbeddingStatus.PROCESSING
-        self.save(update_fields=["embedding_status"])
-
-    def mark_as_completed(self):
-        if self.embedding_status == self.EmbeddingStatus.COMPLETED:
-            return
-
-        self.embedding_status = self.EmbeddingStatus.COMPLETED
-        self.save(update_fields=["embedding_status"])
-
-    def mark_as_failed(self, error_message=None):
-        if self.embedding_status == self.EmbeddingStatus.FAILED and not error_message:
-            return
-
-        self.embedding_status = self.EmbeddingStatus.FAILED
-        if error_message:
-            self.embedding_error_message = error_message
-
-        self.save(update_fields=["embedding_status", "embedding_error_message"])
 
 
 class ParsedEmailEmbedding(TimestampedModel):

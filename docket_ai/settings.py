@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "core",
     "poc",
+    "events",
 ]
 
 if not TESTING:

@@ -28,7 +28,7 @@ def test_with_file_not_associated_with_case(api_client, cases, users, case_facto
         case=case_foo,
         filename="other_file.txt",
         file="path/to/other_file.txt",
-        status=UploadedFile.Status.COMPLETED,
+        embedding_status=UploadedFile.EmbeddingStatus.COMPLETED,
     )
     response = api_client.get(_get_api_url(case_1.uuid, other_uploaded_file.id))
     assert response.status_code == 404
@@ -41,7 +41,7 @@ def test_happy_path(api_client, cases, users):
         case=cases["mahadevan_vs_gopalan"],
         filename="test_file.txt",
         file="path/to/test_file.txt",
-        status=UploadedFile.Status.COMPLETED,
+        embedding_status=UploadedFile.EmbeddingStatus.COMPLETED,
     )
     file_id = uploaded_file.id
 

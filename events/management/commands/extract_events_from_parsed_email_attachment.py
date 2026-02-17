@@ -1,0 +1,93 @@
+from django.core.exceptions import ValidationError
+from django.core.management.base import BaseCommand, CommandError
+from openai import OpenAIError
+
+from events.services import EmailAttachmentEventExtractor
+from poc.models import ParsedEmailAttachment
+
+
+class Command(BaseCommand):
+    help = "Extract events from parsed email attachments and save them to the database."
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "attachment_id",
+            type=int,
+            help="ID of the parsed email attachment to extract events from.",
+        )
+
+    def handle(self, *args, **options):
+        attachment_id = options["attachment_id"]
+
+        try:
+            attachment = ParsedEmailAttachment.objects.select_related(
+                "parsed_email__uploaded_file__case"
+            ).get(id=attachment_id)
+        except ParsedEmailAttachment.DoesNotExist:
+            raise CommandError(
+                f"ParsedEmailAttachment with ID {attachment_id} does not exist."
+            )
+
+        if (
+            attachment.event_extraction_status
+            == ParsedEmailAttachment.EventExtractionStatus.IN_PROGRESS
+        ):
+            self.stdout.write(
+                self.style.WARNING(
+                    f"Event extraction is already in progress for attachment ID {attachment_id}."
+                )
+            )
+            return
+
+        attachment.mark_event_extraction_in_progress()
+
+        self.stdout.write(
+            f"Extracting events from parsed email attachment ID {attachment_id}."
+        )
+
+        service = EmailAttachmentEventExtractor()
+        try:
+            events = service.extract_events(source_entity_id=attachment.id)
+        except (ValueError, OpenAIError) as err:
+            attachment.mark_event_extraction_failed(error_message=str(err))
+            raise CommandError(str(err))
+
+        if not events:
+            attachment.mark_event_extraction_completed()
+            self.stdout.write(
+                self.style.WARNING(
+                    f"No NEW events were extracted from attachment ID {attachment_id}."
+                )
+            )
+            return
+
+        success_count = 0
+        for event in events:
+            try:
+                event.case = attachment.parsed_email.uploaded_file.case
+                event.full_clean()  # Validate the event data before saving
+                event.save()
+                self.stdout.write(f"New event saved: {event}")
+                success_count += 1
+            except ValidationError as err:
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"Validation error for event '{event.title}': {err}"
+                    )
+                )
+                self.stdout.write(f"Event data: {event.data}")
+
+        attachment.mark_event_extraction_completed()
+
+        if len(events) == success_count:
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"All {len(events)} events extracted and saved successfully."
+                )
+            )
+        else:
+            self.stdout.write(
+                self.style.WARNING(
+                    f"{success_count} out of {len(events)} events extracted were saved successfully."
+                )
+            )

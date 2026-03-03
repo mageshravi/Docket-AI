@@ -6,7 +6,7 @@ from django.db import models
 from django.utils.timezone import now
 from pgvector.django import HnswIndex, VectorField
 
-from core.models import EventExtractableModel, TimestampedModel, VectorEmbeddableModel
+from core.models import TimestampedModel, VectorEmbeddableModel
 
 from .managers import ActiveUploadedFilesManager
 from .validators import FileValidator, validate_phone_number
@@ -18,7 +18,7 @@ def get_file_upload_path(instance, filename):
     return f"poc/uploaded_files/case_{instance.case.id}/{today}_{filename}"
 
 
-class UploadedFile(TimestampedModel, VectorEmbeddableModel, EventExtractableModel):
+class UploadedFile(TimestampedModel, VectorEmbeddableModel):
     """
     Model to store uploaded files.
     This model is used to keep track of files uploaded for processing.
@@ -86,7 +86,7 @@ class UploadedFile(TimestampedModel, VectorEmbeddableModel, EventExtractableMode
         self.save(update_fields=["is_deleted"])
 
 
-class ParsedEmail(TimestampedModel, VectorEmbeddableModel, EventExtractableModel):
+class ParsedEmail(TimestampedModel, VectorEmbeddableModel):
     """
     Model to store parsed email data.
     This model is used to keep track of emails that have been parsed.
@@ -111,9 +111,7 @@ class ParsedEmail(TimestampedModel, VectorEmbeddableModel, EventExtractableModel
         return f"{self.subject} dated {self.sent_on}"
 
 
-class ParsedEmailAttachment(
-    TimestampedModel, VectorEmbeddableModel, EventExtractableModel
-):
+class ParsedEmailAttachment(TimestampedModel, VectorEmbeddableModel):
     """
     Model to store parsed email attachments.
     This model is used to keep track of attachments from parsed emails.

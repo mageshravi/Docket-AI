@@ -62,11 +62,10 @@ class UploadedFileAdmin(admin.ModelAdmin):
         "file_name",
         "is_active",
         "embedding_status",
-        "event_extraction_status",
         "created_at",
     )
     list_display_links = ("file_name",)
-    list_filter = ("embedding_status", "event_extraction_status", "is_deleted")
+    list_filter = ("embedding_status", "is_deleted")
     search_fields = ("file_name",)
     ordering = ("-id",)
 
@@ -88,11 +87,10 @@ class ParsedEmailAdmin(admin.ModelAdmin):
         "sender",
         "sent_on",
         "embedding_status",
-        "event_extraction_status",
         "created_at",
     )
     list_display_links = ("subject",)
-    list_filter = ("embedding_status", "event_extraction_status")
+    list_filter = ("embedding_status",)
     ordering = ("-id",)
 
 
@@ -102,9 +100,8 @@ class ParsedEmailAttachmentAdmin(admin.ModelAdmin):
         "id",
         "filename",
         "embedding_status",
-        "event_extraction_status",
         "created_at",
     )
     list_display_links = ("filename",)
-    list_filter = ("embedding_status", "event_extraction_status")
+    list_filter = ("embedding_status",)
     ordering = ("-id",)

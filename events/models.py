@@ -81,6 +81,7 @@ class CandidateEvent(TimestampedModel):
     )
     actors = models.JSONField(
         help_text="A list of actors involved in the candidate event",
+        blank=True,
         default=list,
     )
     evidence_excerpt = models.TextField(

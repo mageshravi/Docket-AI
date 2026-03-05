@@ -165,9 +165,8 @@ Ensure document/email representation events remain included when meaningful.
   "description": "",
   "event_date": "YYYY-MM-DDTHH:MM:SS",
   "place": "",
-  "trigger": "",
-  "participants": [],
-  "attributes": "",
+  "action_phrase": "",
+  "actors": [],
   "source": {
     "type": "document | email | attachment",
     "id": ""
@@ -178,9 +177,8 @@ Ensure document/email representation events remain included when meaningful.
 
 # 13. Output Rules
 
-- Return ONLY NEW finalized events.
+- Return an object with a single key "events" containing the array of new finalized events.
 - Do NOT output candidate events.
 - Do NOT include duplicates.
 - Do NOT include explanations.
-- Return JSON array only.
-- If no valid events remain, return [].
+- No markdown.

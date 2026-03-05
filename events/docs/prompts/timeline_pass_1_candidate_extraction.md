@@ -198,9 +198,8 @@ Direct supporting text snippet from the source.
 
 # 10. Output Rules
 
-- Return ONLY a JSON array.
+- Return an object with a single key "events" containing the array of candidate events.
 - No explanations.
 - No markdown.
 - No deduplication.
 - Include all valid candidates.
-- If none exist, return [].

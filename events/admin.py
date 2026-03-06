@@ -12,9 +12,13 @@ class TimelineExhibitInline(admin.TabularInline):
 
 @admin.register(Timeline)
 class TimelineAdmin(admin.ModelAdmin):
-    list_display = ("name", "case", "status")
+    list_display = (
+        "name",
+        "case",
+        "event_extraction_status",
+    )
     list_display_links = ("name",)
-    list_filter = ("status",)
+    list_filter = ("event_extraction_status",)
     readonly_fields = ("created_by",)
     ordering = ("-created_at",)
     inlines = [TimelineExhibitInline]

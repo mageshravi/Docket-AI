@@ -2,10 +2,53 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 from core.models import TimestampedModel, User
-from poc.models import Case, UploadedFile
+from poc.models import Case, ParsedEmail, ParsedEmailAttachment, UploadedFile
 
 
-class Timeline(TimestampedModel):
+class EventExtractable(models.Model):
+    """
+    An abstract model that represents an entity from which events can be extracted.
+    This can be an uploaded file, a parsed email, or a parsed email attachment.
+    """
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        PROCESSING = "processing", "Processing"
+        COMPLETED = "completed", "Completed"
+        FAILED = "failed", "Failed"
+
+    event_extraction_status = models.CharField(
+        max_length=50,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+
+    class Meta:
+        abstract = True
+
+    def mark_as_processing(self):
+        if self.event_extraction_status == self.Status.PROCESSING:
+            return
+
+        self.event_extraction_status = self.Status.PROCESSING
+        self.save(update_fields=["event_extraction_status"])
+
+    def mark_as_completed(self):
+        if self.event_extraction_status == self.Status.COMPLETED:
+            return
+
+        self.event_extraction_status = self.Status.COMPLETED
+        self.save(update_fields=["event_extraction_status"])
+
+    def mark_as_failed(self):
+        if self.event_extraction_status == self.Status.FAILED:
+            return
+
+        self.event_extraction_status = self.Status.FAILED
+        self.save(update_fields=["event_extraction_status"])
+
+
+class Timeline(TimestampedModel, EventExtractable):
     """
     Represents a timeline of events for a specific case.
     """
@@ -18,12 +61,6 @@ class Timeline(TimestampedModel):
 
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name="timelines")
     name = models.CharField(max_length=255, help_text="Name of the timeline")
-    status = models.CharField(
-        max_length=50,
-        choices=Status.choices,
-        default=Status.PENDING,
-        help_text="The current status of the timeline",
-    )
     created_by = models.ForeignKey(
         User,
         blank=True,
@@ -39,7 +76,7 @@ class Timeline(TimestampedModel):
         return f"{self.name} ({self.case.title})"
 
 
-class TimelineExhibit(TimestampedModel):
+class TimelineExhibit(TimestampedModel, EventExtractable):
     """
     Represents an exhibit (uploaded file) that is part of a timeline.
     """
@@ -220,3 +257,32 @@ class Event(TimestampedModel):
     def get_display_description(self):
         """Return custom description if set, otherwise return original description."""
         return self.custom_description if self.custom_description else self.description
+
+    def get_source_description(self) -> str:
+        """Return a human-readable description of the source entity."""
+        if self.source_entity == self.SourceEntity.UPLOADED_FILE:
+            uploaded_file = UploadedFile.objects.filter(
+                id=self.source_entity_id
+            ).first()
+            if uploaded_file:
+                return f"Uploaded File: {uploaded_file.filename} dated {uploaded_file.created_at.strftime('%Y-%m-%d')}"
+
+            return f"Uploaded File (ID: {self.source_entity_id})"
+
+        if self.source_entity == self.SourceEntity.PARSED_EMAIL:
+            parsed_email = ParsedEmail.objects.filter(id=self.source_entity_id).first()
+            if parsed_email:
+                return f"Parsed Email: '{parsed_email.subject}' from {parsed_email.sender} dated {parsed_email.sent_on.strftime('%Y-%m-%d')}"
+
+            return f"Parsed Email (ID: {self.source_entity_id})"
+
+        if self.source_entity == self.SourceEntity.PARSED_EMAIL_ATTACHMENT:
+            parsed_email_attachment = ParsedEmailAttachment.objects.filter(
+                id=self.source_entity_id
+            ).first()
+            if parsed_email_attachment:
+                return f"Parsed Email Attachment: '{parsed_email_attachment.filename}' from email '{parsed_email_attachment.parsed_email.subject}' dated {parsed_email_attachment.parsed_email.sent_on.strftime('%Y-%m-%d')}"
+
+            return f"Parsed Email Attachment (ID: {self.source_entity_id})"
+
+        return f"Source: {self.source_entity} (ID: {self.source_entity_id})"

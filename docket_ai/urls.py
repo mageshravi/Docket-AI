@@ -24,6 +24,7 @@ from django.urls import include, path
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/poc/", include("poc.api.urls", namespace="poc_api")),
+    path("api/events/", include("events.api.urls", namespace="events_api")),
 ]
 
 if not settings.TESTING:

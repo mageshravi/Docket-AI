@@ -16,11 +16,11 @@ def handle_timeline_exhibit_save(sender, instance, created, **kwargs):
     total_exhibits = TimelineExhibit.objects.filter(timeline_id=timeline.id).count()
     completed_exhibits = TimelineExhibit.objects.filter(
         timeline_id=timeline.id,
-        event_extraction_status=TimelineExhibit.EventExtractionStatus.COMPLETED,
+        event_extraction_status=TimelineExhibit.Status.COMPLETED,
     ).count()
     failed_exhibits = TimelineExhibit.objects.filter(
         timeline_id=timeline.id,
-        event_extraction_status=TimelineExhibit.EventExtractionStatus.FAILED,
+        event_extraction_status=TimelineExhibit.Status.FAILED,
     ).count()
 
     if failed_exhibits > 0:

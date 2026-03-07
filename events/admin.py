@@ -1,22 +1,31 @@
 from django.contrib import admin
 
-from .models import Event
+from .models import Timeline, TimelineEvent, TimelineExhibit
 
 
-@admin.register(Event)
-class EventAdmin(admin.ModelAdmin):
+class TimelineExhibitInline(admin.TabularInline):
+    model = TimelineExhibit
+    extra = 1
+    verbose_name = "Timeline Exhibit"
+    verbose_name_plural = "Timeline Exhibits"
+
+
+@admin.register(Timeline)
+class TimelineAdmin(admin.ModelAdmin):
     list_display = (
-        "id",
+        "name",
         "case",
-        "event_date",
-        "display_title",
+        "event_extraction_status",
     )
-    list_display_links = ("display_title",)
-    list_filter = (
-        "case",
-        "source_entity",
-    )
-    ordering = ("-event_date",)
+    list_display_links = ("name",)
+    list_filter = ("event_extraction_status",)
+    readonly_fields = ("created_by",)
+    ordering = ("-created_at",)
+    inlines = [TimelineExhibitInline]
 
-    def display_title(self, obj):
-        return obj.get_display_title()
+
+@admin.register(TimelineEvent)
+class TimelineEventAdmin(admin.ModelAdmin):
+    list_display = ("id", "title", "timeline", "event_date")
+    list_display_links = ("title",)
+    ordering = ("-created_at",)

@@ -1,31 +1,90 @@
+import logging
+
 from celery import shared_task
-from django.core.management import call_command
+from openai import OpenAIError
+
+from .models import Timeline, TimelineExhibit
+from .services import CandidateEventExtractor, TimelineEventReconstructor
+
+logger = logging.getLogger(__name__)
 
 
 @shared_task
-def extract_events_from_uploaded_file(uploaded_file_id: int):
+def start_timeline_processing(timeline_id: int) -> None:
     """
-    Extract events from the uploaded file.
-    This task is called when a file is uploaded.
+    Start the processing of a timeline by extracting candidate events and reconstructing timeline events (fan-out fan-in architecture).
+    This function is called when a timeline is created and needs to be processed.
     """
-    call_command("extract_events_from_uploaded_file", uploaded_file_id)
+    try:
+        timeline = Timeline.objects.get(id=timeline_id)
+    except Timeline.DoesNotExist:
+        logger.error(f"Timeline with id {timeline_id} does not exist.")
+        return
+
+    timeline.mark_as_processing()
+
+    exhibits = TimelineExhibit.objects.filter(timeline_id=timeline_id).values_list(
+        "id", flat=True
+    )
+    for exhibit_id in exhibits:
+        extract_candidate_events.delay(exhibit_id)
 
 
 @shared_task
-def extract_events_from_parsed_email(parsed_email_id: int):
+def extract_candidate_events(timeline_exhibit_id: int) -> None:
     """
-    Extract events from the parsed email.
-    This task is called when a parsed email is saved to database.
+    Extract candidate events from the timeline exhibit.
+    This task is called when a timeline exhibit is created and needs to have candidate events extracted.
     """
-    call_command("extract_events_from_parsed_email", parsed_email_id)
+    try:
+        timeline_exhibit = TimelineExhibit.objects.get(id=timeline_exhibit_id)
+    except TimelineExhibit.DoesNotExist:
+        logger.error(f"TimelineExhibit with id {timeline_exhibit_id} does not exist.")
+        return
+
+    timeline_exhibit.mark_as_processing()
+
+    try:
+        extractor = CandidateEventExtractor(timeline_exhibit=timeline_exhibit)
+        candidate_events = extractor.run()
+    except (OpenAIError, ValueError) as e:
+        logger.error(
+            f"Error extracting candidate events for TimelineExhibit id {timeline_exhibit_id}: {str(e)}"
+        )
+        timeline_exhibit.mark_as_failed()
+        return
+
+    timeline_exhibit.mark_as_completed()
+
+    logger.info(
+        f"Extracted and saved {len(candidate_events)} candidate events for TimelineExhibit id {timeline_exhibit_id}."
+    )
 
 
 @shared_task
-def extract_events_from_parsed_email_attachment(parsed_email_attachment_id: int):
+def reconstruct_timeline_events(timeline_id: int) -> None:
     """
-    Extract events from the parsed email attachment.
-    This task is called when a parsed email attachment is saved to database.
+    Reconstruct timeline events from candidate events.
+    This task is called when candidate events have been extracted and need to be reconstructed into timeline events.
     """
-    call_command(
-        "extract_events_from_parsed_email_attachment", parsed_email_attachment_id
+    try:
+        timeline = Timeline.objects.get(id=timeline_id)
+    except Timeline.DoesNotExist:
+        logger.error(f"Timeline with id {timeline_id} does not exist.")
+        return
+
+    try:
+        reconstructor = TimelineEventReconstructor(timeline=timeline)
+        timeline_events = reconstructor.run()
+    except (OpenAIError, ValueError) as e:
+        logger.error(
+            f"Error reconstructing timeline events for Timeline id {timeline_id}: {str(e)}"
+        )
+        timeline.mark_as_failed()
+        return
+
+    timeline.mark_as_completed()
+
+    logger.info(
+        f"Reconstructed and saved {len(timeline_events)} timeline events for Timeline id {timeline_id}."
     )

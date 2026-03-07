@@ -1,5 +1,8 @@
 # Extracting events
 
+Version: 1.0
+Status: Deprecated
+
 ## What is an Event?
 
 An event is a specific occurrence anchored in time. It must involve a **Trigger** (the action), **Participants** (the entities), and a **Temporal Anchor** (when it happened).

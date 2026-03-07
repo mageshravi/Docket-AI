@@ -34,7 +34,8 @@ Important: If you can't ask "When did this happen?", it's likely NOT an event bu
 1. Carefully read through the entire document
 2. Review the list of existing events (if provided) to avoid duplication
 3. Identify all NEW events that meet the criteria above and are not already in the existing events list
-4. For each NEW event, extract the following information:
+4. If the same event is referenced multiple times across different sources (documents, emails, or attachments), include it only once. Do not create duplicate entries for the same event.
+5. For each NEW event, extract the following information:
    - **title**: A concise title (max 255 characters).
    - **description**: A brief sentence containing details about the trigger, participants, temporal & spatial anchors, and attributes
    - **event_date**: The date and time of the occurrence in ISO 8601 format (YYYY-MM-DDTHH:MM:SS). If only a date is mentioned, use 00:00:00 for the time. If the date is relative (e.g., "next Tuesday", "last week"), calculate the actual date based on the reference date (see below) and mention it as inferred.
@@ -42,8 +43,11 @@ Important: If you can't ask "When did this happen?", it's likely NOT an event bu
    - **trigger**: The specific word or phrase expressing the event occurrence
    - **participants**: List of entities involved (people, organizations, products)
    - **attributes**: Status or modifiers like "Confirmed", "Canceled", "Tentative", "Completed"
-5. **Date Ranges**: If a range of dates is found (e.g., "from date A till date B", "between date A and date B"), identify them as **two separate events** - one with the starting date and another with the ending date.
-6. **Multiple Dates**: If multiple dates are listed (e.g., "date A, date C, and date F"), identify **each date separately** as an individual event.
+   - **source**: Source metadata object for the event:
+     - **type**: One of `document`, `email`, or `attachment`
+     - **id**: ID of the source entity (document, email or attachment) from which the event was extracted
+6. **Date Ranges**: If a range of dates is found (e.g., "from date A till date B", "between date A and date B"), identify them as **two separate events** - one with the starting date and another with the ending date.
+7. **Multiple Dates**: If multiple dates are listed (e.g., "date A, date C, and date F"), identify **each date separately** as an individual event.
 
 ## Special Instructions by Content Type
 
@@ -61,8 +65,8 @@ Important: If you can't ask "When did this happen?", it's likely NOT an event bu
 
 1. Use the email's **sent date** as the reference for computing any events with relative temporal anchors (e.g., "yesterday", "tomorrow", "tomorrow morning").
 2. **Important**: Always include one event as the **first event** representing the email itself:
-   - **title**: Format as either "Email Sent: &lt;Subject&gt;" or "Email Received: &lt;Subject&gt;" from the perspective of the recipient/stakeholder.
-   - **description**: A summary of the email's main content, purpose, and key details.
+   - **title**: Format as either "Email Sent: &lt;Subject&gt;" or "Email Received: &lt;Subject&gt;" from the perspective of the our client.
+   - **description**: A summary of the email's main content, purpose, and key details. List the filenames of attachments if any.
    - **event_date**: The date and time the email was sent or received.
    - **trigger**: "Email"
 
@@ -85,7 +89,11 @@ Return a JSON response with array of NEW events only. Do not include any events 
     "Alice Johnson",
     "Acme Corp"
   ],
-  "attributes": "Confirmed"
+   "attributes": "Confirmed",
+   "source": {
+      "type": "document",
+      "id": "101"
+   }
 }
 ```
 

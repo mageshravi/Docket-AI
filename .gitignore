@@ -13,5 +13,6 @@ dist/
 tmp/
 media/
 styleguide/
+logs/
 
 .DS_Store

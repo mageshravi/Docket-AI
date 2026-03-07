@@ -2,7 +2,15 @@
     "workbench.colorCustomizations": {
         "activityBar.background": "#060c5d",
         "titleBar.activeBackground": "#091583",
-        "titleBar.activeForeground": "#FFFBFD"
+        "titleBar.activeForeground": "#FFFBFD",
+        "titleBar.inactiveBackground": "#081181",
+        "titleBar.inactiveForeground": "#060B58",
+        "statusBar.background": "#0A1394",
+        "statusBar.foreground": "#FBFCFF",
+        "statusBar.debuggingBackground": "#0A1394",
+        "statusBar.debuggingForeground": "#FBFCFF",
+        "statusBar.noFolderBackground": "#0A1394",
+        "statusBar.noFolderForeground": "#FBFCFF"
     },
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff",

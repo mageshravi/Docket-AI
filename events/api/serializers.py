@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
-from events.models import Timeline, TimelineExhibit
+from events.models import Timeline, TimelineEvent, TimelineExhibit
 from poc.models import UploadedFile
 
 
@@ -116,3 +116,23 @@ class TimelineSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+
+
+class TimelineEventSerializer(serializers.ModelSerializer):
+    place = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TimelineEvent
+        fields = (
+            "id",
+            "title",
+            "description",
+            "event_date",
+            "place",
+            "created_at",
+            "updated_at",
+        )
+
+    def get_place(self, obj):
+        # Return null for blank values to keep API responses consistent.
+        return obj.place or None

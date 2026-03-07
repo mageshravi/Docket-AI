@@ -1,13 +1,17 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from events.api.serializers import TimelineCreateSerializer, TimelineSerializer
-from events.models import Timeline
+from events.api.serializers import (
+    TimelineCreateSerializer,
+    TimelineEventSerializer,
+    TimelineSerializer,
+)
+from events.models import Timeline, TimelineEvent
 from events.tasks import start_timeline_processing
 from poc.models import Case
 
@@ -58,3 +62,13 @@ class ListCreateTimelineAPI(ListCreateAPIView):
         return Response(
             TimelineSerializer(timeline).data, status=status.HTTP_201_CREATED
         )
+
+
+class ListTimelineEventAPI(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TimelineEventSerializer
+
+    def get_queryset(self):
+        timeline_id = self.kwargs["timeline_id"]
+        get_object_or_404(Timeline, id=timeline_id)
+        return TimelineEvent.objects.filter(timeline_id=timeline_id)

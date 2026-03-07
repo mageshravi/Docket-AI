@@ -4,7 +4,7 @@ from pytest_factoryboy import register
 from rest_framework.test import APIClient
 
 from core.models import User
-from events.tests.factories import EventFactory
+from events.tests.factories import TimelineFactory
 from poc.models import Case, Litigant, LitigantRole
 from poc.tests.factories import (
     CaseFactory,
@@ -26,7 +26,7 @@ register(UploadedFileFactory)
 register(ParsedEmailFactory)
 register(ParsedEmailAttachmentFactory)
 
-register(EventFactory)
+register(TimelineFactory)
 
 
 @pytest.fixture()

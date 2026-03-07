@@ -1,6 +1,9 @@
 import factory
 
 
-class EventFactory(factory.django.DjangoModelFactory):
+class TimelineFactory(factory.django.DjangoModelFactory):
+    name = factory.Sequence(lambda n: f"Timeline {n}")
+    case = factory.SubFactory("poc.tests.factories.CaseFactory")
+
     class Meta:
-        model = "events.Event"
+        model = "events.Timeline"

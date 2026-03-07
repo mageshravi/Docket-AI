@@ -4,7 +4,7 @@ from events.models import Timeline, TimelineExhibit
 
 
 def _get_api_url():
-    return reverse("events:timeline")
+    return reverse("events_api:timelines")
 
 
 def test_with_anonymous_user(api_client):

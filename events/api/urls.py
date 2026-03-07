@@ -1,8 +1,8 @@
 from django.urls import path
 
-from events.api.views import CreateTimelineAPI
+from events.api.views import ListCreateTimelineAPI
 
 app_name = "events"
 urlpatterns = [
-    path("timelines/", CreateTimelineAPI.as_view(), name="timelines"),
+    path("timelines/", ListCreateTimelineAPI.as_view(), name="timelines"),
 ]

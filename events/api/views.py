@@ -1,24 +1,49 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
 
 from events.api.serializers import TimelineCreateSerializer, TimelineSerializer
+from events.models import Timeline
 from events.tasks import start_timeline_processing
 from poc.models import Case
 
 
-class CreateTimelineAPI(CreateAPIView):
+class ListCreateTimelineAPI(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = TimelineCreateSerializer
 
+    def _get_case_id_from_query_params(self):
+        case_id = self.request.query_params.get("case")
+        if case_id is None:
+            return None
+
+        try:
+            return int(case_id)
+        except (TypeError, ValueError):
+            raise ValidationError({"case": "A valid integer is required."})
+
+    def get_queryset(self):
+        queryset = Timeline.objects.filter(created_by=self.request.user)
+
+        case_id = self._get_case_id_from_query_params()
+        if case_id is not None:
+            queryset = queryset.filter(case_id=case_id)
+
+        return queryset
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        case_id = self.request.data.get("case")
-        case = get_object_or_404(Case, id=case_id)
-        context["case"] = case
+
+        if self.request.method == "POST":
+            case_id = self.request.data.get("case")
+            if case_id:
+                case = get_object_or_404(Case, id=case_id)
+                context["case"] = case
+
         return context
 
     def create(self, request, *args, **kwargs):

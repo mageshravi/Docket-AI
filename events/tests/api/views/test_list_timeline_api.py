@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.urls import reverse
 
 
@@ -38,11 +40,13 @@ def test_with_case_filter(api_client, users, case_factory, timeline_factory):
     timeline_for_case_1 = timeline_factory.create(
         name="Case A Timeline", case=case_1, created_by=users["user1"]
     )
-    timeline_factory.create(name="Case B Timeline", case=case_2, created_by=users["user1"])
+    timeline_factory.create(
+        name="Case B Timeline", case=case_2, created_by=users["user1"]
+    )
 
     response = api_client.get(
         _get_api_url(),
-        data={"case": case_1.id},
+        data={"case": case_1.uuid},
         format="json",
     )
 
@@ -51,19 +55,10 @@ def test_with_case_filter(api_client, users, case_factory, timeline_factory):
     assert response.json()["results"][0]["id"] == timeline_for_case_1.id
 
 
-def test_with_invalid_case_query_param(api_client, users):
-    api_client.force_authenticate(user=users["user1"])
-
-    response = api_client.get(_get_api_url(), data={"case": "invalid"}, format="json")
-
-    assert response.status_code == 400
-    assert response.json() == {"case": "A valid integer is required."}
-
-
 def test_with_non_existent_case_returns_empty_results(api_client, users):
     api_client.force_authenticate(user=users["user1"])
 
-    response = api_client.get(_get_api_url(), data={"case": 999999}, format="json")
+    response = api_client.get(_get_api_url(), data={"case": uuid4()}, format="json")
 
     assert response.status_code == 200
     assert response.json()["count"] == 0

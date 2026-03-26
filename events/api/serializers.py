@@ -6,7 +6,7 @@ from poc.models import UploadedFile
 
 
 class TimelineCreateSerializer(serializers.ModelSerializer):
-    case = serializers.IntegerField(write_only=True)
+    case = serializers.UUIDField(write_only=True)
     exhibits = serializers.ListField(
         child=serializers.IntegerField(min_value=1),
         required=False,

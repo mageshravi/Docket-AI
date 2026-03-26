@@ -44,7 +44,7 @@ def test_with_duplicate_name_for_case(
         _get_api_url(),
         data={
             "name": "Timeline Alpha",
-            "case": case.id,
+            "case": case.uuid,
             "exhibits": [exhibit.id],
         },
         format="json",
@@ -63,7 +63,7 @@ def test_without_exhibits_param_and_no_case_exhibits(api_client, users, case_fac
         _get_api_url(),
         data={
             "name": "Timeline Alpha",
-            "case": case.id,
+            "case": case.uuid,
         },
         format="json",
     )
@@ -84,7 +84,7 @@ def test_with_empty_exhibits_list(api_client, users, case_factory):
         _get_api_url(),
         data={
             "name": "Timeline Alpha",
-            "case": case.id,
+            "case": case.uuid,
             "exhibits": [],
         },
         format="json",
@@ -131,7 +131,7 @@ def test_happy_path_with_specific_exhibits(
             _get_api_url(),
             data={
                 "name": "Timeline Alpha",
-                "case": case.id,
+                "case": case.uuid,
                 "exhibits": [exhibit_1.id, exhibit_2.id],
             },
             format="json",
@@ -181,7 +181,7 @@ def test_happy_path_without_exhibits_uses_all_case_exhibits(
         _get_api_url(),
         data={
             "name": "Timeline Alpha",
-            "case": case.id,
+            "case": case.uuid,
         },
         format="json",
     )

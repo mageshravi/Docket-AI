@@ -49,9 +49,9 @@ class ListCreateTimelineAPI(ListCreateAPIView):
         context = super().get_serializer_context()
 
         if self.request.method == "POST":
-            case_id = self.request.data.get("case")
-            if case_id:
-                case = get_object_or_404(Case, id=case_id)
+            case_uuid = self.request.data.get("case")
+            if case_uuid:
+                case = get_object_or_404(Case, uuid=case_uuid)
                 context["case"] = case
 
         return context

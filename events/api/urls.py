@@ -3,6 +3,7 @@ from django.urls import path
 from events.api.views import (
     ListCreateTimelineAPI,
     ListTimelineEventsAPI,
+    ListTimelineExhibitsAPI,
     RetrieveTimelineAPI,
 )
 
@@ -18,5 +19,10 @@ urlpatterns = [
         "timelines/<int:timeline_id>/events/",
         ListTimelineEventsAPI.as_view(),
         name="timeline_events",
+    ),
+    path(
+        "timelines/<int:timeline_id>/exhibits/",
+        ListTimelineExhibitsAPI.as_view(),
+        name="timeline_exhibits",
     ),
 ]

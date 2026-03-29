@@ -3,6 +3,7 @@ ruff~=0.12
 django-allow-cidr~=0.8
 django-debug-toolbar~=5.2
 django-htmlmin~=0.11
+django-rest-knox~=5.0.4
 debugpy~=1.8.15
 pytest~=8.4
 pytest-cov~=7.0.0

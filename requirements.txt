@@ -53,6 +53,7 @@ django==5.2.4
     #   django-allow-cidr
     #   django-celery-results
     #   django-debug-toolbar
+    #   django-rest-knox
     #   djangorestframework
 django-allow-cidr==0.8.0
     # via -r requirements.in
@@ -62,8 +63,12 @@ django-debug-toolbar==5.2.0
     # via -r requirements.in
 django-htmlmin==0.11.0
     # via -r requirements.in
-djangorestframework==3.16.1
+django-rest-knox==5.0.4
     # via -r requirements.in
+djangorestframework==3.16.1
+    # via
+    #   -r requirements.in
+    #   django-rest-knox
 email-reply-parser==0.5.12
     # via -r requirements.in
 et-xmlfile==2.0.0

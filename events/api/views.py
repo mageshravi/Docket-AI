@@ -10,11 +10,19 @@ from rest_framework.response import Response
 from events.api.serializers import (
     TimelineCreateSerializer,
     TimelineEventSerializer,
+    TimelineExhibitSerializer,
     TimelineSerializer,
 )
 from events.models import Timeline
 from events.tasks import start_timeline_processing
 from poc.models import Case
+
+__all__ = [
+    "ListCreateTimelineAPI",
+    "RetrieveTimelineAPI",
+    "ListTimelineEventsAPI",
+    "ListTimelineExhibitsAPI",
+]
 
 
 class ListCreateTimelineAPI(ListCreateAPIView):
@@ -90,3 +98,13 @@ class ListTimelineEventsAPI(ListAPIView):
         timeline_id = self.kwargs.get("timeline_id")
         timeline = get_object_or_404(Timeline, id=timeline_id)
         return timeline.events.all()
+
+
+class ListTimelineExhibitsAPI(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TimelineExhibitSerializer
+
+    def get_queryset(self):
+        timeline_id = self.kwargs.get("timeline_id")
+        timeline = get_object_or_404(Timeline, id=timeline_id)
+        return timeline.exhibits.filter(exhibit__is_deleted=False).order_by("id")

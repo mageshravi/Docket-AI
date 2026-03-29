@@ -24,5 +24,8 @@
     },
     "editor.formatOnSave": true,
     "files.trimTrailingWhitespace": true,
-    "files.insertFinalNewline": true
+    "files.insertFinalNewline": true,
+    "chat.tools.terminal.autoApprove": {
+        "pytest": true
+    }
 }

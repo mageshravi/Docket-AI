@@ -18,7 +18,8 @@
     "watch:kss": "onchange 'static/css/src/*.scss' -- npm run kss"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "caniuse-lite": "^1.0.30001781"
   },
   "peerDependencies": {
     "typescript": "^5"

@@ -1,0 +1,23 @@
+.m-alert-icon {
+    --icon-size: 24px;
+
+    display: inline-block;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    background-image: url('/static/wicons/sprite-alert-icons.svg');
+    background-size: calc(4 * var(--icon-size)) auto;
+    background-repeat: no-repeat;
+    background-position: calc(-3 * var(--icon-size)) 0;
+
+    &--success {
+        background-position: 0 0;
+    }
+
+    &--warning {
+        background-position: calc(-1 * var(--icon-size)) 0;
+    }
+
+    &--error {
+        background-position: calc(-2 * var(--icon-size)) 0;
+    }
+}

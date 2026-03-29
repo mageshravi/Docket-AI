@@ -128,3 +128,21 @@ class TimelineEventSerializer(serializers.ModelSerializer):
             "event_date",
             "place",
         )
+
+
+class TimelineExhibitSerializer(serializers.ModelSerializer):
+    filename = serializers.CharField(source="exhibit.filename", read_only=True)
+    file = serializers.FileField(source="exhibit.file", read_only=True)
+    exhibit_code = serializers.CharField(source="exhibit.exhibit_code", read_only=True)
+
+    class Meta:
+        model = TimelineExhibit
+        fields = (
+            "id",
+            "filename",
+            "file",
+            "exhibit_code",
+            "event_extraction_status",
+            "created_at",
+            "updated_at",
+        )

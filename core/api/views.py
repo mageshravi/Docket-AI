@@ -1,4 +1,4 @@
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from knox.views import LoginView as KnoxLoginView
 from rest_framework import status
@@ -13,6 +13,7 @@ from .serializers import UserSerializer
 __all__ = [
     "LoginAPI",
     "SessionLoginAPI",
+    "SessionLogoutAPI",
     "UserDetailAPI",
 ]
 
@@ -44,6 +45,16 @@ class SessionLoginAPI(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SessionLogoutAPI(APIView):
+    """Logout API view that uses Django's session authentication."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        logout(request)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserDetailAPI(RetrieveAPIView):

@@ -4,8 +4,6 @@ from .models import (
     Case,
     CaseLitigant,
     ChatThread,
-    Litigant,
-    LitigantRole,
     ParsedEmail,
     ParsedEmailAttachment,
     UploadedFile,
@@ -27,14 +25,6 @@ class CaseAdmin(admin.ModelAdmin):
     inlines = (CaseLitigantInline,)
 
 
-@admin.register(Litigant)
-class LitigantAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "bio", "phone", "created_at")
-    list_display_links = ("name",)
-    search_fields = ("name", "bio", "phone", "email")
-    ordering = ("-id",)
-
-
 @admin.register(ChatThread)
 class ChatThreadAdmin(admin.ModelAdmin):
     list_display = ("id", "title", "case", "created_at")
@@ -43,14 +33,6 @@ class ChatThreadAdmin(admin.ModelAdmin):
         "title",
         "case__case_number",
     )
-    ordering = ("-id",)
-
-
-@admin.register(LitigantRole)
-class LitigantRoleAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "handle", "created_at")
-    list_display_links = ("handle",)
-    search_fields = ("name", "handle")
     ordering = ("-id",)
 
 

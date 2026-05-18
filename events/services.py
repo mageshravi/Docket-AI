@@ -16,10 +16,10 @@ from tenacity import (
     wait_exponential,
 )
 
+from litigants.models import LitigantRole
 from poc.models import (
     Case,
     CaseLitigant,
-    LitigantRole,
     ParsedEmail,
     ParsedEmailAttachment,
     UploadedFile,

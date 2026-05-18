@@ -1,7 +1,7 @@
 import pytest
 from django.core.exceptions import ValidationError
 
-from poc.validators import validate_phone_number
+from litigants.validators import validate_phone_number
 
 
 def test_phone_number_validator():

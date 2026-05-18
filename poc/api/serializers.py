@@ -4,48 +4,22 @@ from rest_framework.serializers import (
     ValidationError,
 )
 
+from litigants.api.serializers import LitigantRoleSerializer, LitigantSerializer
+from litigants.models import Litigant, LitigantRole
 from poc.models import (
     Case,
     CaseLitigant,
     ChatMessage,
     ChatThread,
-    Litigant,
-    LitigantRole,
     UploadedFile,
 )
 
 __all__ = [
-    "LitigantSerializer",
     "CaseSerializer",
     "CaseCompactSerializer",
     "UploadedFileSerializer",
     "ChatThreadSerializer",
 ]
-
-
-class LitigantRoleSerializer(ModelSerializer):
-    class Meta:
-        model = LitigantRole
-        exclude = (
-            "created_at",
-            "updated_at",
-        )
-        read_only_fields = (
-            "id",
-            "created_at",
-            "updated_at",
-        )
-
-
-class LitigantSerializer(ModelSerializer):
-    class Meta:
-        model = Litigant
-        fields = "__all__"
-        read_only_fields = (
-            "id",
-            "created_at",
-            "updated_at",
-        )
 
 
 class CaseLitigantWriteSerializer(ModelSerializer):

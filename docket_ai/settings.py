@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "knox",
     "core",
+    "litigants",
     "poc",
     "events",
 ]

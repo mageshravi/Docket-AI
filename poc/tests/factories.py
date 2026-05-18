@@ -1,11 +1,6 @@
 import factory
 
 
-class LitigantFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "poc.Litigant"
-
-
 class CaseFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "poc.Case"

@@ -7,11 +7,11 @@ urlpatterns = [
     path(
         "litigants/",
         ListCreateLitigantAPI.as_view(),
-        name="list_create",
+        name="list",
     ),
     path(
         "litigants/<int:id>/",
         RetrieveLitigantAPI.as_view(),
-        name="retrieve",
+        name="detail",
     ),
 ]

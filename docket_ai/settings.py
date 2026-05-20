@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "knox",
     "core",
     "litigants",
+    "cases",
     "poc",
     "events",
 ]

@@ -2,7 +2,7 @@ from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
 from core.models import TimestampedModel, User
-from poc.models import Case, UploadedFile
+from poc.models import UploadedFile
 
 
 class EventExtractable(models.Model):
@@ -60,7 +60,9 @@ class Timeline(TimestampedModel, EventExtractable):
     )
 
     # fields
-    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name="timelines")
+    case = models.ForeignKey(
+        "cases.Case", on_delete=models.CASCADE, related_name="timelines"
+    )
     name = models.CharField(
         max_length=255,
         validators=[name_validator],

@@ -1,6 +1,7 @@
 from langchain_core.tools import BaseTool
 
-from poc.models import Case, ChatThread
+from cases.models import Case
+from poc.models import ChatThread
 
 __all__ = [
     "CaseDetails",

@@ -2,7 +2,7 @@ from django.urls import reverse
 
 
 def _get_api_url():
-    return reverse("litigants:list_create")
+    return reverse("litigants:list")
 
 
 def test_with_anonymous_user(api_client):

@@ -1,38 +1,11 @@
 from django.contrib import admin
 
 from .models import (
-    Case,
-    CaseLitigant,
     ChatThread,
-    Litigant,
-    LitigantRole,
     ParsedEmail,
     ParsedEmailAttachment,
     UploadedFile,
 )
-
-
-class CaseLitigantInline(admin.StackedInline):
-    model = CaseLitigant
-    extra = 1
-
-
-@admin.register(Case)
-class CaseAdmin(admin.ModelAdmin):
-    list_display = ("id", "case_number", "title", "created_at")
-    list_display_links = ("title",)
-    search_fields = ("case_number", "title")
-    readonly_fields = ("uuid",)
-    ordering = ("-id",)
-    inlines = (CaseLitigantInline,)
-
-
-@admin.register(Litigant)
-class LitigantAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "bio", "phone", "created_at")
-    list_display_links = ("name",)
-    search_fields = ("name", "bio", "phone", "email")
-    ordering = ("-id",)
 
 
 @admin.register(ChatThread)
@@ -43,14 +16,6 @@ class ChatThreadAdmin(admin.ModelAdmin):
         "title",
         "case__case_number",
     )
-    ordering = ("-id",)
-
-
-@admin.register(LitigantRole)
-class LitigantRoleAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "handle", "created_at")
-    list_display_links = ("handle",)
-    search_fields = ("name", "handle")
     ordering = ("-id",)
 
 

@@ -3,7 +3,7 @@ from django.urls import reverse
 
 def _get_api_url(litigant_id):
     return reverse(
-        "poc:litigant_detail",
+        "litigants:detail",
         kwargs={"id": litigant_id},
     )
 

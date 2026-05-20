@@ -2,7 +2,7 @@ from django.urls import reverse
 
 
 def _get_api_url(case_uuid):
-    return reverse("poc:case_detail", kwargs={"case_uuid": case_uuid})
+    return reverse("cases:detail", kwargs={"case_uuid": case_uuid})
 
 
 def test_with_anonymous_user(api_client, cases):

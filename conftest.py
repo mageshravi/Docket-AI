@@ -3,15 +3,15 @@ from django.test import Client
 from pytest_factoryboy import register
 from rest_framework.test import APIClient
 
+from cases.models import Case
+from cases.tests.factories import CaseFactory, CaseLitigantFactory
 from core.models import User
 from events.tests.factories import TimelineFactory
-from poc.models import Case, Litigant, LitigantRole
+from litigants.models import Litigant, LitigantRole
+from litigants.tests.factories import LitigantFactory
 from poc.tests.factories import (
-    CaseFactory,
-    CaseLitigantFactory,
     ChatMessageFactory,
     ChatThreadFactory,
-    LitigantFactory,
     ParsedEmailAttachmentFactory,
     ParsedEmailFactory,
     UploadedFileFactory,

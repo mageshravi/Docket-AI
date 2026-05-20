@@ -1,9 +1,6 @@
-from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import (
     ListCreateAPIView,
-    RetrieveAPIView,
-    RetrieveUpdateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.pagination import PageNumberPagination
@@ -11,71 +8,21 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from cases.models import Case
 from poc.api.serializers import (
-    CaseCompactSerializer,
-    CaseSerializer,
     ChatMessageSerializer,
     ChatThreadSerializer,
-    LitigantSerializer,
     UploadedFileSerializer,
 )
 from poc.langchain.chat_agent import send_message
-from poc.models import Case, ChatMessage, ChatThread, Litigant, UploadedFile
+from poc.models import ChatMessage, ChatThread, UploadedFile
 
 __all__ = [
-    "ListCreateCaseAPI",
-    "RetrieveUpdateCaseAPI",
     "ListCreateUploadedFileAPI",
     "RetrieveUpdateDestroyUploadedFileAPI",
     "ListCreateThreadAPI",
     "ListCreateMessageAPI",
-    "ListCreateLitigantAPI",
-    "RetrieveLitigantAPI",
 ]
-
-
-class ListCreateCaseAPI(ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = CaseSerializer
-
-    def get_queryset(self):
-        queryset = Case.objects.all().order_by("-id")
-
-        # check for query param 'search'
-        search = self.request.query_params.get("search")
-        if search:
-            if len(search.strip()) > 2:
-                queryset = queryset.filter(
-                    Q(title__icontains=search) | Q(case_number__icontains=search)
-                )
-            else:
-                queryset = queryset.none()
-
-        return queryset
-
-
-class RetrieveUpdateCaseAPI(RetrieveUpdateAPIView):
-    permission_classes = [IsAuthenticated]
-    lookup_field = "uuid"
-    lookup_url_kwarg = "case_uuid"
-    http_method_names = ["get", "patch", "options"]
-
-    def get_queryset(self):
-        if self.request.query_params.get("compact") == "true":
-            return Case.objects.all()
-
-        return Case.objects.prefetch_related(
-            "case_litigants__litigant",
-            "case_litigants__role",
-        )
-
-    def get_serializer_class(self):
-        # check for query param 'compact'
-        if self.request.query_params.get("compact") == "true":
-            return CaseCompactSerializer
-
-        # otherwise return full serializer
-        return CaseSerializer
 
 
 class ListCreateUploadedFileAPI(ListCreateAPIView):
@@ -222,35 +169,3 @@ class ListCreateMessageAPI(APIView):
         )
         op_serializer = ChatMessageSerializer(messages, many=True)
         return Response(op_serializer.data, status=201)
-
-
-class ListCreateLitigantAPI(ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = LitigantSerializer
-
-    def get_queryset(self):
-        # check for query param 'search'
-        search = self.request.query_params.get("search")
-        if search:
-            if len(search.strip()) > 2:
-                # search in name, bio, email and phone fields
-                return Litigant.objects.filter(
-                    Q(name__icontains=search)
-                    | Q(bio__icontains=search)
-                    | Q(email__icontains=search)
-                    | Q(phone__icontains=search)
-                ).order_by("-id")
-            else:
-                return Litigant.objects.none()
-
-        return Litigant.objects.all().order_by("-id")
-
-
-class RetrieveLitigantAPI(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = LitigantSerializer
-    lookup_field = "id"
-    lookup_url_kwarg = "id"
-
-    def get_queryset(self):
-        return Litigant.objects.all()

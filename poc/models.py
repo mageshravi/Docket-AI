@@ -9,7 +9,7 @@ from pgvector.django import HnswIndex, VectorField
 from core.models import TimestampedModel, VectorEmbeddableModel
 
 from .managers import ActiveUploadedFilesManager
-from .validators import FileValidator, validate_phone_number
+from .validators import FileValidator
 
 
 def get_file_upload_path(instance, filename):
@@ -58,7 +58,7 @@ class UploadedFile(TimestampedModel, VectorEmbeddableModel):
         validators=[file_validator],
     )
     case = models.ForeignKey(
-        "Case", on_delete=models.CASCADE, related_name="uploaded_files"
+        "cases.Case", on_delete=models.CASCADE, related_name="uploaded_files"
     )
     exhibit_code = models.CharField(
         max_length=32,
@@ -226,93 +226,6 @@ class UploadedFileEmbedding(TimestampedModel):
         return f"Embedding for {self.uploaded_file.file.name}"
 
 
-class LitigantRole(TimestampedModel):
-    """
-    Model to store the role of a litigant in a legal case.
-    """
-
-    name = models.CharField(max_length=255)
-    handle = models.CharField(max_length=255, unique=True)
-    description = models.TextField(blank=True, null=True)
-
-    class Meta:
-        db_table = "poc_litigant_roles"
-
-    def __str__(self):
-        return self.name
-
-
-class Litigant(TimestampedModel):
-    """
-    Model to store a litigant in a legal case.
-    """
-
-    name = models.CharField(max_length=255)
-    bio = models.CharField(max_length=255)
-    email = models.EmailField(blank=True)
-    phone = models.CharField(
-        max_length=20, blank=True, validators=[validate_phone_number]
-    )
-    address = models.TextField(blank=True)
-    notes = models.TextField(blank=True)
-
-    # ? Why no unique constraints.
-    # * Because a litigant may be involved in different cases with different bio's/notes, and also different timelines.
-
-    class Meta:
-        db_table = "poc_litigants"
-
-    def __str__(self):
-        return f"{self.name} {self.bio}"
-
-
-class Case(TimestampedModel):
-    """
-    Model to store a legal case.
-    """
-
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    title = models.CharField(max_length=255)
-    description = models.TextField(
-        blank=True,
-        help_text="Include the nature of dispute and summary of the conflict.",
-    )
-    litigants = models.ManyToManyField(
-        Litigant, related_name="cases", through="CaseLitigant"
-    )
-    case_number = models.CharField(max_length=64, unique=True, blank=True, null=True)
-
-    class Meta:
-        db_table = "poc_cases"
-
-    def __str__(self):
-        return self.title
-
-
-class CaseLitigant(TimestampedModel):
-    """
-    Model to store the relationship between a case and a litigant.
-    """
-
-    case = models.ForeignKey(
-        Case, on_delete=models.CASCADE, related_name="case_litigants"
-    )
-    litigant = models.ForeignKey(
-        Litigant, on_delete=models.CASCADE, related_name="case_litigants"
-    )
-    role = models.ForeignKey(
-        LitigantRole, on_delete=models.CASCADE, related_name="case_litigants"
-    )
-    is_our_client = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = "poc_case_litigants"
-        unique_together = (("case", "litigant"),)
-
-    def __str__(self):
-        return f"{self.litigant} in {self.case}"
-
-
 class ChatThread(TimestampedModel):
     """
     Model to store a chat thread.
@@ -322,7 +235,7 @@ class ChatThread(TimestampedModel):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     title = models.CharField(max_length=255, blank=True)
     case = models.ForeignKey(
-        Case,
+        "cases.Case",
         on_delete=models.CASCADE,
         related_name="chat_threads",
         blank=False,

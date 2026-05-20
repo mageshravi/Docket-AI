@@ -7,6 +7,7 @@ from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIV
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from cases.models import Case
 from events.api.serializers import (
     TimelineCreateSerializer,
     TimelineEventSerializer,
@@ -15,7 +16,6 @@ from events.api.serializers import (
 )
 from events.models import Timeline
 from events.tasks import start_timeline_processing
-from poc.models import Case
 
 __all__ = [
     "ListCreateTimelineAPI",

@@ -45,7 +45,6 @@ services:
       - "8025:8025" # web ui
     networks:
       - docket_ai-network
-    restart: on-failure:5
 
   docket_ai-redis:
     image: redis:8.2-bookworm
